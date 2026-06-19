@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
-import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES } from './types.mjs';
+import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES, SEQUENCE_TYPES } from './types.mjs';
+
+const sequenceCheatsheet = '{ type:"sequence", title, actors:[{id,label}], messages:[{from,to,text, kind?:"sync"|"async"|"return", activate?, return?}] }  // messages ordered top→bottom; activate/return drive activation bars';
 
 const gridCheatsheets = {
   matrix: '{ type:"matrix", title, cols:[..headers..], rows:[{label, cells:[..]}] }',
@@ -29,6 +31,7 @@ export function describeForType(type) {
   if (GRAPH_TYPES.includes(type)) return { schema: graphSchema, cheatsheet: graphCheatsheet };
   if (LANE_TYPES.includes(type)) return { schema: {}, cheatsheet: laneCheatsheets[type] || Object.values(laneCheatsheets).join('\n') };
   if (GRID_TYPES.includes(type)) return { schema: {}, cheatsheet: gridCheatsheets[type] || Object.values(gridCheatsheets).join('\n') };
+  if (SEQUENCE_TYPES.includes(type)) return { schema: {}, cheatsheet: sequenceCheatsheet };
   return { schema, cheatsheet: describeSpecSchema().cheatsheet };
 }
 

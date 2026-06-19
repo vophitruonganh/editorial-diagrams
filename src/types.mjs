@@ -10,7 +10,7 @@ export const GRAPH_TYPES = [
   'org-chart', 'decision-tree', 'knowledge-graph', 'data-lineage',
 ];
 export const LANE_TYPES = ['git-workflow', 'timeline', 'gantt', 'user-journey'];
-export const SEQUENCE_TYPES = [];
+export const SEQUENCE_TYPES = ['sequence'];
 export const GRID_TYPES = ['matrix', 'quadrant', 'kanban', 'swimlane'];
 
 // Flow engine is the default (preset/blocks specs); these are documented for describe_spec_schema.

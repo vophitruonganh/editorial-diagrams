@@ -1,0 +1,22 @@
+{
+  "type": "sequence",
+  "id": "sequence-login-mfa",
+  "eyebrow": "UML · Sequence diagram",
+  "title": "Login + MFA — message order",
+  "subtitle": "lifeline = actor · arrow = message · bar = activation",
+  "actors": [
+    { "id": "u", "label": "End user" },
+    { "id": "auth", "label": "api-auth" },
+    { "id": "cred", "label": "backend-credential" },
+    { "id": "chal", "label": "api-challenge" }
+  ],
+  "messages": [
+    { "from": "u", "to": "auth", "text": "POST /login", "kind": "sync", "activate": true },
+    { "from": "auth", "to": "cred", "text": "verify password", "kind": "sync", "activate": true },
+    { "from": "cred", "to": "auth", "text": "ok", "kind": "return", "return": true },
+    { "from": "auth", "to": "chal", "text": "send OTP", "kind": "async" },
+    { "from": "u", "to": "auth", "text": "submit OTP", "kind": "sync" },
+    { "from": "auth", "to": "u", "text": "200 · Set-Cookie + tokens", "kind": "return", "return": true }
+  ],
+  "caption": "Identity Platform · Sequence — login + MFA"
+}

@@ -1,4 +1,16 @@
-import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES } from './types.mjs';
+import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES, SEQUENCE_TYPES } from './types.mjs';
+
+function validateSequence(spec) {
+  const errors = [];
+  if (!Array.isArray(spec.actors) || spec.actors.length === 0) errors.push('`actors` must be a non-empty array');
+  const ids = new Set((spec.actors || []).map(a => a && a.id));
+  (spec.messages || []).forEach((m, i) => {
+    if (!m || !m.from || !m.to) { errors.push(`messages[${i}] needs from+to`); return; }
+    if (!ids.has(m.from)) errors.push(`messages[${i}].from "${m.from}" is not a declared actor`);
+    if (!ids.has(m.to)) errors.push(`messages[${i}].to "${m.to}" is not a declared actor`);
+  });
+  return errors;
+}
 
 const GRID_REQUIRED = { matrix: ['rows'], quadrant: ['items'], kanban: ['columns'], swimlane: ['lanes', 'steps'] };
 function validateGrid(spec) {
@@ -82,6 +94,11 @@ export function validateSpec(spec) {
   // grid-engine types
   if (GRID_TYPES.includes(spec.type)) {
     errors.push(...validateGrid(spec));
+    return { valid: errors.length === 0, errors };
+  }
+  // sequence engine
+  if (SEQUENCE_TYPES.includes(spec.type)) {
+    errors.push(...validateSequence(spec));
     return { valid: errors.length === 0, errors };
   }
 

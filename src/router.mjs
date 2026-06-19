@@ -4,12 +4,14 @@ import { renderSpec } from './gen.mjs';
 import { renderGraph } from './engines/graph.mjs';
 import { renderLane } from './engines/lane.mjs';
 import { renderGrid } from './engines/grid.mjs';
-import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES } from './types.mjs';
+import { renderSequence } from './engines/sequence.mjs';
+import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES, SEQUENCE_TYPES } from './types.mjs';
 
 const ENGINES = {};
 for (const t of GRAPH_TYPES) ENGINES[t] = renderGraph;
 for (const t of LANE_TYPES) ENGINES[t] = renderLane;
 for (const t of GRID_TYPES) ENGINES[t] = renderGrid;
+for (const t of SEQUENCE_TYPES) ENGINES[t] = renderSequence;
 
 // Later phases register their engines here (lane, sequence).
 export function registerEngine(type, fn) { ENGINES[type] = fn; }
