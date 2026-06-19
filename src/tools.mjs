@@ -1,10 +1,10 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { renderSpec } from './gen.mjs';
+import { renderByType } from './router.mjs';
 import { loadThemeCss } from './themes/index.mjs';
 import { renderHtml } from './render.mjs';
 import { validateSpec } from './validate.mjs';
-import { describeSpecSchema } from './describe.mjs';
+import { describeSpecSchema, describeForType } from './describe.mjs';
 
 const text = (t) => ({ type: 'text', text: t });
 const errorResult = (msg) => ({ isError: true, content: [text(msg)] });
@@ -37,7 +37,7 @@ export async function renderDiagram(args = {}) {
   const css = loadThemeCss('editorial');
   let rendered;
   try {
-    const html = renderSpec(spec, css);
+    const html = renderByType(spec, css);
     rendered = await renderHtml(html, {
       format,
       scale: args.scale ?? 2,
@@ -70,6 +70,6 @@ export function validateSpecTool(args = {}) {
 }
 
 export function describeSchemaTool(args = {}) {
-  const d = describeSpecSchema(args.topic);
+  const d = args.type ? describeForType(args.type) : describeSpecSchema(args.topic);
   return { content: [text(d.cheatsheet + '\n\n--- JSON Schema ---\n' + JSON.stringify(d.schema, null, 2))] };
 }

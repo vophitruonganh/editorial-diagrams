@@ -45,8 +45,8 @@ export function buildServer(server) {
     'describe_spec_schema',
     {
       title: 'Describe diagram spec schema',
-      description: 'Return the JSON schema + DSL cheat-sheet (block types, card DSL, presets, partials).',
-      inputSchema: { topic: z.enum(['cards', 'blocks', 'presets']).optional() },
+      description: 'Return the JSON schema + DSL cheat-sheet. Pass `type` (e.g. "flowchart") for graph specs, or `topic` for the flow/C4 DSL.',
+      inputSchema: { topic: z.enum(['cards', 'blocks', 'presets']).optional(), type: z.string().optional() },
     },
     (args) => describeSchemaTool(args),
   );

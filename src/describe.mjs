@@ -1,6 +1,20 @@
 import { readFileSync } from 'node:fs';
+import { GRAPH_TYPES } from './types.mjs';
 
 const schema = JSON.parse(readFileSync(new URL('./schema/spec.schema.json', import.meta.url)));
+const graphSchema = JSON.parse(readFileSync(new URL('./schema/graph.schema.json', import.meta.url)));
+
+const graphCheatsheet =
+  'Graph spec (flowchart, …): { type, title, direction?, nodes:[{id, card}], edges:[{from,to,label?,style?,arrow?}] }\n' +
+  '  node.card uses the card DSL: "[kind:][+]Name | [tech] | detail" (kind ∈ person|ext|ds|jewel|sec|muted)\n' +
+  '  edge.style ∈ orthogonal(default)|rounded|straight · edge.arrow:false to drop the arrowhead\n' +
+  '  direction ∈ TB(default)|LR|BT|RL · layout is automatic (dagre)';
+
+// Returns the schema + cheat-sheet for a given diagram type (graph types → graph schema).
+export function describeForType(type) {
+  if (GRAPH_TYPES.includes(type)) return { schema: graphSchema, cheatsheet: graphCheatsheet };
+  return { schema, cheatsheet: describeSpecSchema().cheatsheet };
+}
 
 const blockTypes = [
   '{cards:[...], label?, ctx?, cols?, conn?} — labelled grid of cards',
