@@ -1,0 +1,5 @@
+node_modules/
+test/golden/*.png
+*.log
+.DS_Store
+diagrams-out/
