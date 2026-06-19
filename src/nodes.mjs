@@ -20,4 +20,10 @@ export function cardNode(dsl, geom) {
   return `<div class="${cls}" style="${style}">${stereo}<h4>${esc(c.h)}</h4>${tech}${p}</div>`;
 }
 
+// Extensible node-kind dispatch. Later phases register diamond/entity-table/etc.
+const RENDERERS = { card: (n, geom) => cardNode(n.card ?? n.label ?? '', geom) };
+export function registerNode(kind, fn) { RENDERERS[kind] = fn; }
+export function renderNode(node, geom) { return (RENDERERS[node.kind] || RENDERERS.card)(node, geom); }
+export function hasNodeKind(kind) { return Boolean(RENDERERS[kind]); }
+
 export { esc, posStyle };
