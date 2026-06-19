@@ -1,0 +1,33 @@
+{
+  "preset": "c4-l3",
+  "id": "26-comp-api-saml2",
+  "eyebrow": "Component view (C4 L3) · api-saml2",
+  "title": "Inside api-saml2 — the SAML2 Identity Provider",
+  "subtitle": "box = <b>component</b> [technology] · arrow = <b>uses / calls</b> · SP-initiated SSO; signs SAML assertions",
+  "callersLabel": "Callers · actor + external SP (context)",
+  "callers": ["person:End user|‹person›|authenticates at the IdP", "ext:SAML Service Provider|‹external system›|SP-initiated SSO"],
+  "conn": "[HTTPS · SAML] AuthnRequest → · ← signed assertion",
+  "boundary": "‹container› api-saml2 — [Go · echo · REST]",
+  "layers": [
+    { "l": "API layer", "c": 1, "center": true, "maxw": 520,
+      "cards": ["+Echo Router|[echo]|/sso · /metadata · /slo"],
+      "conn": "dispatch" },
+    { "l": "SAML protocol controllers", "c": 3,
+      "cards": ["+SSO Controller|AuthnRequest → assertion", "+Metadata Endpoint|IdP metadata XML", "+SLO Controller|single logout"],
+      "conn": "use SAML core" },
+    { "l": "SAML core (saml/)", "c": 3,
+      "cards": ["+IdP Core|idp.go · app.go", "sec:+Assertion Signing|signing.go · signs responses", "+SAML Session Store|session.go · storage.go"],
+      "conn": "authenticate · identity" }
+  ],
+  "downstreamConn": "[REST] / [Thrift]",
+  "downstreamLabel": "Downstream · other containers (context — each has its own L3)",
+  "downstream": ["ext:api-auth|[REST]|auth_service (session)", "ext:api-oauth2|[REST]|token_service", "ext:backend-auth|[Thrift]|auth_backend (identity · signing material)"],
+  "rels": [
+    "SSO Controller → IdP Core → Assertion Signing (signs the SAML response)",
+    "IdP Core → api-auth (auth_service) for the user session · backend-auth (auth_backend) for identity",
+    "Token material via api-oauth2 (token_service)",
+    "SLO Controller → SAML Session Store → terminate federated sessions"
+  ],
+  "refs": "deps from api-saml2/dev.config.yaml — session <code>api-auth</code> (L3) · token <code>api-oauth2</code> (L3) · identity <code>backend-auth</code> (L3) — appears in Dynamic: <i>SAML SSO</i> — zoom out: Container view <i>SSO (SAML2)</i> (L2)",
+  "caption": "Identity Platform · Component view · api-saml2 (C4 L3) — components from saml/ + api/ + client/"
+}

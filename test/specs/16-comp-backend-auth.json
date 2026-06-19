@@ -1,0 +1,30 @@
+{
+  "preset": "c4-l3",
+  "id": "16-comp-backend-auth",
+  "eyebrow": "Component view (C4 L3) · backend-auth",
+  "title": "Inside backend-auth — components & how they call each other",
+  "subtitle": "box = <b>component</b> [technology] · arrow = <b>uses / calls</b> · the JWT signing key lives in one component (crown jewel)",
+  "callers": ["ext:api-auth|[Thrift client]", "ext:api-oauth2|[Thrift client]"],
+  "conn": "[Thrift :80] RPC",
+  "boundary": "‹container› backend-auth — [Go · Thrift server :80]",
+  "layers": [
+    { "l": "API layer", "c": 1, "center": true, "maxw": 560,
+      "cards": ["+Thrift RPC Dispatcher|[go-common server]|authenticates caller · routes each RPC to a domain service"],
+      "conn": "dispatch by domain" },
+    { "l": "Domain service components", "c": 4,
+      "cards": ["+Account Service|users · credentials", "+Session Service|session lifecycle", "+Auth-Code Service|OAuth codes · PKCE", "+Consent Service|granted scopes", "+Device Service|trusted devices", "+SSO-Blacklist Service|token revocation", "+Effective-Policy Service|computed policy", "jewel:+JWT Key Manager|holds & uses signing key"],
+      "conn": "read / write entities · publish events" },
+    { "l": "Persistence & cross-cutting components", "c": 3,
+      "cards": ["+Repository / DAO|[mongo-go-driver]|per-domain repositories + cache", "jewel:+Field Encryption|[Category-A keys]|encrypts PII / secrets before persist", "+Event-Bus Producer|[kafka client]|emits domain events"],
+      "conn": "[mongo wire] · [RESP] · [kafka]" }
+  ],
+  "downstream": ["ds:MongoDB · main|[datastore]|identity (encrypted at field level)", "ds:KeyDB|[datastore · Redis]|sessions · SSO blacklist", "ds:Kafka|[event bus]|event_bus"],
+  "rels": [
+    "Dispatcher → domain services → Repository/DAO → MongoDB (writes pass through Field Encryption)",
+    "Session &amp; SSO-Blacklist services → KeyDB",
+    "Every service → Event-Bus Producer → Kafka",
+    "JWT Key Manager → used by token-issuing flows in api-oauth2 — its key never leaves this container"
+  ],
+  "refs": "callers <code>api-auth</code> (L3) · <code>api-oauth2</code> (L3) — appears in Dynamic: <i>Login + MFA</i> · <i>OAuth2 token</i> — zoom out: Container view <i>Auth &amp; Tokens</i> (L2)",
+  "caption": "Identity Platform · Component view · backend-auth (C4 L3) — components decomposed from client/* + internal/ + model/"
+}

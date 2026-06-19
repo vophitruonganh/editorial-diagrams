@@ -1,0 +1,18 @@
+{
+  "preset": "dynamic",
+  "id": "32-dyn-saml-sso",
+  "eyebrow": "C4 Dynamic · runtime flow — SAML SSO (SP-initiated)",
+  "title": "Execution order: federated SSO via SAML2",
+  "subtitle": "numbered steps = <b>runtime order</b> · each step = <b>component → component</b> + protocol · complements the api-saml2 L3 (static)",
+  "steps": [
+    { "from": "End user", "to": "SAML SP", "proto": "[HTTPS] login", "detail": "user starts login at the relying application" },
+    { "from": "SAML SP", "to": "api-saml2 /sso", "proto": "[SAML] AuthnRequest", "detail": "SP-initiated request, via nginx proxy — api-saml2 is its own edge (NOT via api-gateway)" },
+    { "from": "api-saml2", "to": "api-auth", "proto": "[REST] session", "detail": "establish / verify the user session — if none → run Login + MFA first" },
+    { "from": "api-saml2 · IdP Core", "to": "backend-auth", "proto": "[Thrift] identity", "detail": "fetch the user identity & attributes" },
+    { "from": "api-saml2", "to": "api-oauth2", "proto": "[REST] token_service", "detail": "obtain token material for assertion claims" },
+    { "from": "api-saml2 · Assertion Signing", "detail": "builds & cryptographically signs the SAML response (assertion)" },
+    { "from": "api-saml2", "to": "SAML SP (ACS)", "proto": "[HTTPS] SAML Response", "detail": "POST the signed assertion to the SP — user is now logged in", "done": true }
+  ],
+  "refs": "runs across: <code>api-saml2</code> (L3, §A4) · <code>api-auth</code> (L3, §A2) · <code>backend-auth</code> (L3, §A6) — zoom out: Container view <i>SSO (SAML2)</i> (L2)",
+  "caption": "Identity Platform · C4 Dynamic · SAML SSO (SP-initiated) — step order across api-saml2 components"
+}

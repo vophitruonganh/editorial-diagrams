@@ -1,0 +1,39 @@
+{
+  "preset": "c4-l3",
+  "id": "13-comp-api-auth",
+  "eyebrow": "Component view (C4 L3) · api-auth",
+  "title": "Inside api-auth — components & their dependencies",
+  "subtitle": "box = <b>component</b> · horizontal arrow = <b>uses / calls</b> (dependency, not time) · for execution order see the <b>Dynamic</b> diagram",
+  "callersLabel": "",
+  "callersCenter": true,
+  "callersMaxw": 340,
+  "callers": ["person:End user|‹person›|signs in via api-gateway"],
+  "conn": "[HTTPS] dispatch",
+  "boundary": "‹container› api-auth — [Go · echo · REST]",
+  "layers": [
+    { "l": "API layer", "c": 1, "center": true, "maxw": 600,
+      "cards": ["+Echo Router + Middleware|[go-common]|routing · auth/JWT middleware · binds api/* to controllers"],
+      "conn": "routes request to a controller" },
+    { "l": "Primary login pipeline (arrows = uses)",
+      "flow": ["+Login Controller|password / passwordless", { "arrow": "uses · MFA" }, "+MFA Orchestrator|mfa · totp · webauthn", { "arrow": "uses · build token" }, "sec:+Token / JWT Module|token · jwt · pkce"],
+      "conn": "controllers & modules → integration clients" },
+    { "l": "Other endpoint controllers (peers — each invoked directly by the Router)", "c": 4,
+      "cards": ["+Social & SAML Login|oauth · saml", "sec:+Session & Cookie Mgr|session · device · reauth", "+User / Application|profile · service account", "+Credential / Device|credential · device endpoints"],
+      "note": "↑ peers: they don't call each other — the Router invokes each controller directly; all share the modules &amp; clients below." },
+    { "l": "Integration clients (backend/ + client/)", "c": 4,
+      "cards": ["+Backend Clients|[Thrift]|→ backend-auth · backend-challenge", "+Peer API Clients|[REST]|→ credential · challenge · oauth2 · organization · access · policy · audit", "+Core Clients|[REST/Thrift]|→ file-manager · geoip · master-data · email/sms", "+External Clients|[OAuth]|→ Google OAuth"] }
+  ],
+  "downstreamConn": "[Thrift :80] · [REST] · [HTTPS] call",
+  "downstreamLabel": "Downstream · other containers / external (context — each has its own L3)",
+  "downstream": ["ext:backend-auth / -challenge|[Thrift backend]|identity · sessions · MFA store", "ext:api peers|[REST]|credential · challenge · oauth2 · …", "Core (shared system)|[REST / Thrift]|file-manager · geoip · master-data", "ext:Google OAuth|‹external system›|federated login"],
+  "rels": [
+    "<b>Login Controller</b> → Peer API Clients → <code>api-credential</code> (verify) · → <b>MFA Orchestrator</b> (when MFA on) · → <b>Token/JWT Module</b> (issue)",
+    "<b>MFA Orchestrator</b> → Peer API Clients → <code>api-challenge</code> (OTP/TOTP/WebAuthn)",
+    "<b>Token/JWT Module</b> → Backend Clients → <code>backend-auth</code> / <code>api-oauth2</code> (sign — key never local)",
+    "<b>Session &amp; Cookie Mgr</b> → Backend Clients → <code>backend-auth</code> (session in KeyDB)"
+  ],
+  "relsTitle": "Relationships (uses) — verified from action/ + client/:",
+  "note": "api-auth holds <b>no</b> Mongo and <b>no</b> JWT key — all persistence/signing goes through the backends.",
+  "refs": "downstream <code>backend-auth</code> (L3) · <code>api-oauth2</code> (L3) · <code>api-challenge</code> — appears in Dynamic: <i>Login + MFA</i> — zoom out: Container view <i>Auth &amp; Tokens</i> (L2)",
+  "caption": "Identity Platform · Component view · api-auth (C4 L3) — dependencies (static). Execution order → Dynamic: Login + MFA."
+}

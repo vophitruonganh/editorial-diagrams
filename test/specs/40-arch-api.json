@@ -1,0 +1,32 @@
+{
+  "preset": "c4-l3",
+  "id": "40-arch-api",
+  "eyebrow": "Component view (C4 L3) · archetype — api-*",
+  "title": "Archetype — inside any api-* REST service",
+  "subtitle": "box = <b>component</b> · arrow = <b>uses / calls</b> · the generic skeleton shared by the ~10 REST services (api-organization, api-workspace, api-iam …)",
+  "callersLabel": "Caller (context)",
+  "callers": ["ext:api-gateway|[REST]|routes the request here"],
+  "conn": "[REST] /platform/<domain>/v1",
+  "boundary": "‹container› api-<service> — [Go · echo · REST] · archetype",
+  "layers": [
+    { "l": "API layer", "c": 2,
+      "cards": ["+Echo Router + Middleware|[go-common]|auth / JWT / recover", "+Route Registrars|api/<resource>|bind endpoints"],
+      "conn": "dispatch to handler" },
+    { "l": "Application layer", "c": 2,
+      "cards": ["+Handlers / Controllers|action/<resource>|request handling", "+Domain Utils|utils/|validation · helpers"],
+      "conn": "persist / call via" },
+    { "l": "Integration layer", "c": 3,
+      "cards": ["+Own-Backend Facade|backend/|[Thrift] → its backend-<svc>", "+Cross-service Clients|client/|[REST] → peer api-* / Core", "+Config Loader|conf/|validated env"],
+      "conn": "[Thrift] / [REST]" }
+  ],
+  "downstreamLabel": "Downstream (context — each has its own L3)",
+  "downstream": ["ext:backend-<svc>|[Thrift]|its data backend", "ext:peer api-* / Core|[REST]|other services", "ds:KeyDB|[datastore]|cache / session"],
+  "rels": [
+    "Router → Route Registrars (api/) → Handlers (action/)",
+    "Handlers → Domain Utils (validation) → Own-Backend Facade",
+    "Own-Backend Facade → backend-<svc> (Thrift); Cross-service Clients → peer api-* / Core",
+    "Holds no Mongo directly — all persistence goes through the backend tier"
+  ],
+  "refs": "concrete examples: <code>api-auth</code> (L3, §A2) · <code>api-organization</code> · <code>api-workspace</code> · <code>api-iam</code> … — pattern shared by ~10 REST services",
+  "caption": "Identity Platform · Component view · api-* archetype (C4 L3) — generic skeleton from api/ + action/ + backend/ + client/"
+}

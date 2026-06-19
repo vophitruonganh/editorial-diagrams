@@ -1,0 +1,145 @@
+/* ============================================================
+   EDITORIAL DIAGRAM STYLE — the standard for all hand-crafted
+   architecture diagrams. Auto-layout (grid/flex) => no overlap.
+   Author diagrams as semantic HTML using these classes; render
+   to PNG via render.mjs. See STYLE.md.
+   ============================================================ */
+:root{
+  --ink:#1F2B45; --muted:#6B7280; --faint:#9AA3AF;
+  --card:#FFFFFF; --border:#DCE0E6; --bg:#FFFFFF;
+  --amber:#C2780A; --amber-line:#E08E0B;
+  --slate:#475569; --slate-bg:#F1F4F8;
+  --blue:#2563EB;  --blue-bg:#EEF3FF;
+  --green:#2E8B6B; --green-bg:#ECF6F1;
+  --amberc:#C2780A;--amber-bg:#FBF1E0;
+  --indigo:#4F46E5;--indigo-bg:#EEF0FF;
+}
+*{box-sizing:border-box}
+.diagram{width:1200px;background:var(--bg);padding:34px 38px 30px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink)}
+
+/* header */
+.eyebrow{font-size:12.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--amber)}
+.title{font-size:26px;font-weight:700;margin:7px 0 3px}
+.subtitle{font-size:14.5px;color:var(--muted);margin:0}
+.rule{height:1px;background:#ECEEF2;margin:16px 0 24px}
+
+/* containers (layers) */
+.layer{position:relative;border:1.4px dashed var(--slate);background:var(--slate-bg);
+  border-radius:14px;padding:30px 22px 22px;margin:0}
+.layer.blue{border-color:var(--blue);background:var(--blue-bg)}
+.layer.green{border-color:var(--green);background:var(--green-bg)}
+.layer.amber{border-color:var(--amberc);background:var(--amber-bg)}
+.pill{position:absolute;top:-13px;left:22px;background:var(--slate);color:#fff;
+  font-size:11.5px;font-weight:700;letter-spacing:.05em;padding:5px 13px;border-radius:13px;white-space:nowrap}
+.pill.blue{background:var(--blue)} .pill.green{background:var(--green)} .pill.amber{background:var(--amberc)}
+
+/* card grids — equal columns, fixed gap, auto height, text wraps */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)} .g5{grid-template-columns:repeat(5,1fr)}
+.g6{grid-template-columns:repeat(6,1fr)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 15px}
+.card.accent{border-color:var(--indigo);background:var(--indigo-bg)}
+.card h4{margin:0 0 5px;font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.25}
+.card p{margin:2px 0;font-size:12.5px;color:var(--muted);line-height:1.45}
+.card .mono{font-family:SFMono-Regular,Consolas,monospace;font-size:12px}
+
+/* connector between stacked blocks (pure CSS, never overlaps) */
+.conn{display:flex;flex-direction:column;align-items:center;gap:3px;margin:6px 0}
+.conn .lbl{font-size:12px;font-weight:600;color:var(--amber)}
+.conn .vline{width:2px;height:30px;background:var(--amber-line)}
+/* A connector OWNS the gap: the block directly above (:has) and the block directly
+   below contribute ZERO margin, so the distance between the two boxes is always
+   exactly the connector's height — the arrowhead lands on the next block every time,
+   with no per-diagram pixel tuning and regardless of surrounding section labels. */
+*:has(+ .conn){margin-bottom:0}
+.conn + *{margin-top:0}
+.conn .arrow{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--amber-line)}
+
+/* sequence steps */
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:15px;align-items:flex-start;background:var(--card);
+  border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.step.done{border-color:var(--green)}
+.step .n{flex:0 0 36px;width:36px;height:36px;border-radius:9px;background:var(--indigo);
+  color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center}
+.step.done .n{background:var(--green)}
+.step .b{flex:1}
+.step .b h4{margin:0 0 3px;font-size:15px;font-weight:700;color:var(--ink)}
+.step .b p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45}
+.stepconn{display:flex;justify-content:center;padding:5px 0}
+.stepconn .a{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--amber-line)}
+
+/* footer + caption */
+.footer{background:#EEF1F5;border-radius:12px;padding:15px 18px;margin-top:24px}
+.footer .b{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.5}
+.footer .m{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.5}
+.caption{font-size:11px;color:var(--faint);margin-top:16px}
+
+/* layout helpers */
+.center{margin-left:auto;margin-right:auto}
+.row{display:flex;gap:16px;align-items:stretch}
+.row > *{flex:1}
+
+/* horizontal flow (request path / pipeline) */
+.flow{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:0}
+.flow > .card{flex:1 1 0;min-width:0;text-align:center}
+.hconn{flex:0 0 72px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.hconn .lbl{font-size:11px;font-weight:600;color:var(--amber);white-space:nowrap}
+.hconn .line{display:flex;align-items:center}
+.hconn .hl{width:36px;height:2px;background:var(--amber-line)}
+.hconn .ha{width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid var(--amber-line)}
+
+/* compact tile card (title-centric, for dense grids) */
+.card.tile{padding:12px 10px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.card.tile h4{margin:0;font-size:13.5px}
+.card.tile p{font-size:11.5px;margin-top:3px}
+
+/* ── C4 Container view helpers ───────────────────────────────────────── */
+/* technology label on a container box (C4: name + [technology] + responsibility) */
+.c4tech{display:block;font-size:11px;font-weight:600;color:#8a94a6;font-family:SFMono-Regular,Consolas,monospace;margin:1px 0 3px}
+/* element kinds */
+.card.person{background:#EEF0FF;border-color:#4F46E5}
+.card.ext{background:#FBF1E0;border-color:#C2780A}
+.card.ds{background:#ECF6F1;border-color:#2E8B6B}
+/* system boundary box wrapping internal containers */
+.boundary{position:relative;border:1.5px dashed #1F2B45;border-radius:16px;padding:32px 22px 22px;background:#fcfdff;margin:0}
+.boundary > .blabel{position:absolute;top:-12px;left:22px;background:#1F2B45;color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.04em;padding:4px 13px;border-radius:13px;white-space:nowrap}
+
+/* ── Component / Dynamic diagram helpers (centralized — one source of truth) ── */
+.glabel{font-weight:700;font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin:22px 2px 10px}
+.glabel.api{color:var(--blue)} .glabel.be{color:var(--amberc)} .glabel.wk{color:var(--green)}
+.stereo{display:block;font-size:10.5px;color:var(--faint);font-style:italic;margin-bottom:2px}
+.sub{font-size:11.5px;color:var(--muted);font-weight:600;margin:16px 2px 8px}
+.flowcap{font-size:11.5px;color:var(--muted);text-align:center;margin:8px 2px 2px}
+.peernote{font-size:11px;color:var(--faint);font-style:italic;margin:6px 2px 0}
+/* context-group label for L3: marks boxes that are NOT the focus container
+   (callers = other containers · datastores = infrastructure) — they have no boundary by C4 convention */
+.ctxlabel{font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin:18px 2px 8px}
+/* cross-reference line linking a diagram to its related views (Dynamic ↔ L3 ↔ L2) */
+.refs{font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px}
+.refs b{color:var(--ink)}
+/* footer relationship list: one idea per line — never run-on (use • bullets + <br>) */
+.footer .rels{font-size:13px;color:var(--ink);line-height:1.7}
+/* dynamic-step inline actors / protocols */
+.actor{font-family:SFMono-Regular,Consolas,monospace;font-size:11px;color:var(--blue);font-weight:700}
+.proto{font-family:SFMono-Regular,Consolas,monospace;font-size:10.5px;color:#9A6206}
+.rels{font-size:12px;color:#42526E;line-height:1.7;margin:4px 2px}
+.rels b{color:var(--ink)}
+.card.jewel{border-color:var(--amber-line);background:#FFFAF0}
+.card.jewel h4{color:#9A6206}
+.card.sec{border-color:var(--blue);background:#F5F8FF}
+.card.sec h4{color:#1D4ED8}
+.card.muted h4{color:var(--muted)}
+
+/* ── SPACING STANDARD — vertical rhythm so nothing touches/overlaps ──────────
+   Every stacked block keeps an even gap; the first block inside a boundary/layer
+   lets the container padding own the gap (no double spacing). See STYLE.md. */
+.grid + .grid, .flow + .grid, .grid + .flow, .steps + .grid, .grid + .steps{margin-top:16px}
+/* anything stacked next to a boundary/layer keeps an even gap (datastores below a boundary, stacked boundaries, etc.) */
+.boundary + .grid, .grid + .boundary, .boundary + .flow, .flow + .boundary,
+.boundary + .steps, .steps + .boundary, .boundary + .boundary,
+.layer + .grid, .grid + .layer, .boundary + .layer, .layer + .boundary{margin-top:18px}
+.boundary > .blabel + *{margin-top:0}
+.layer > .pill + *{margin-top:0}

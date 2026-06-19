@@ -1,0 +1,30 @@
+{
+  "preset": "c4-l3",
+  "id": "41-arch-backend",
+  "eyebrow": "Component view (C4 L3) · archetype — backend-*",
+  "title": "Archetype — inside any backend-* Thrift service",
+  "subtitle": "box = <b>component</b> · arrow = <b>uses / calls</b> · the generic skeleton shared by the 9 Thrift backends (backend-organization, backend-workspace …)",
+  "callers": ["ext:api-* services|[Thrift client]|RPC callers"],
+  "conn": "[Thrift :80] RPC",
+  "boundary": "‹container› backend-<service> — [Go · Thrift server :80] · archetype",
+  "layers": [
+    { "l": "API layer", "c": 1, "center": true, "maxw": 540,
+      "cards": ["+Thrift RPC Dispatcher|main.go · go-common|routes each RPC to a domain handler"],
+      "conn": "dispatch by domain" },
+    { "l": "Domain handlers (client/*.go)", "c": 2,
+      "cards": ["+Domain Handlers · per entity|client/<entity>.go|one per domain object", "+Service Logic|internal/|business rules"],
+      "conn": "read / write · publish" },
+    { "l": "Persistence & cross-cutting", "c": 4,
+      "cards": ["+Models + Repository|model/<domain>/ · cache|[mongo-go-driver]", "jewel:+Field Encryption|[Category-A keys]|PII / secrets", "+Event-Bus Producer|[kafka client]|domain events", "+Config|conf/|validated env"],
+      "conn": "[mongo wire] · [RESP] · [kafka]" }
+  ],
+  "downstream": "@stores",
+  "rels": [
+    "Dispatcher → domain handlers (client/*.go) → Service Logic → Models / Repository",
+    "Writes pass through Field Encryption → MongoDB",
+    "Cache / session → KeyDB; domain events → Event-Bus Producer → Kafka",
+    "api-* never read these collections directly — only via this Thrift interface"
+  ],
+  "refs": "concrete examples: <code>backend-auth</code> (L3, §A6) · <code>backend-organization</code> · <code>backend-workspace</code> … — pattern shared by 9 backends",
+  "caption": "Identity Platform · Component view · backend-* archetype (C4 L3) — generic skeleton from client/* + internal/ + model/"
+}

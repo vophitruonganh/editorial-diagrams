@@ -1,0 +1,32 @@
+{
+  "preset": "c4-l3",
+  "id": "28-comp-text-search",
+  "eyebrow": "Component view (C4 L3) · text-search",
+  "title": "Inside text-search — the Elasticsearch-backed search service",
+  "subtitle": "<b>Purpose:</b> full-text search over users / organizations / workspaces — the only IDP service backed by Elasticsearch. box = component · arrow = uses / calls. <b>For the index↔query flow see the Dynamic view.</b>",
+  "callersLabel": "Callers · other containers (context — each has its own L3)",
+  "callers": ["ext:api-* (query)|[REST]|api-admin · api-auth · api-workspace · org-admin", "ext:worker-* (index)|[REST / event]|push index updates from backend data"],
+  "conn": "[REST] /search · /document (query + index)",
+  "boundary": "‹container› text-search — [Go · echo · REST]",
+  "layers": [
+    { "l": "API layer", "c": 1, "center": true, "maxw": 520,
+      "cards": ["+Search / Index API|[Go · echo]|api/search.go · /search + /document"],
+      "conn": "dispatch" },
+    { "l": "Application components", "c": 3,
+      "cards": ["+Search Handler|action/search.go|query → results", "+Document Indexer|action/document.go|apply index updates", "+Document Model + Cache|model/ · cache/|doc mapping · hot-query cache"],
+      "conn": "use the ES client" },
+    { "l": "Integration", "c": 1, "center": true, "maxw": 420,
+      "cards": ["+Elasticsearch Client|client/elasticsearch|index + query ES"] }
+  ],
+  "downstreamConn": "[ES HTTP] read / write the index",
+  "downstreamLabel": "Datastore · shared infrastructure (context — not decomposed here)",
+  "downstream": ["ds:Elasticsearch|[datastore]|search indices (rebuildable — derived from Mongo)"],
+  "rels": [
+    "Callers → Search / Index API → Search Handler (query) · Document Indexer (index)",
+    "worker-* push index updates sourced from backend MongoDB `main` data",
+    "Search Handler / Indexer → Elasticsearch Client → Elasticsearch",
+    "Index is <b>derived / rebuildable</b> — Mongo `main` is the source of truth (re-index to restore)"
+  ],
+  "refs": "<b>flow → Dynamic: Search (index + query)</b> · callers <code>api-admin</code> / <code>api-auth</code> / <code>api-workspace</code> / <code>worker-*</code> — zoom out: Container view <i>Supporting services</i> (L2, §7) — data source: <code>backend-*</code> Mongo `main`",
+  "caption": "Identity Platform · Component view · text-search (C4 L3) — ES-backed search · components from api/ + action/ + client/elasticsearch"
+}

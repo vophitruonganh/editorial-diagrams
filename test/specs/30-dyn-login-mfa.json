@@ -1,0 +1,25 @@
+{
+  "preset": "dynamic",
+  "id": "30-dyn-login-mfa",
+  "eyebrow": "C4 Dynamic · runtime flow — Login + MFA + token issue",
+  "title": "Execution order: how the components collaborate",
+  "subtitle": "numbered steps = <b>runtime order</b> · each step = <b>component → component</b> + protocol · complements the api-auth L3 (static)",
+  "steps": [
+    { "from": "End user", "to": "Echo Router", "proto": "[HTTPS] POST /auth/login", "detail": "credentials submitted via api-gateway; router dispatches to the Login Controller." },
+    { "from": "Login Controller", "to": "Credential Client → backend-credential", "proto": "[Thrift] verify", "detail": "password / WebAuthn verified against the credential store." },
+    { "from": "Login Controller", "to": "MFA Orchestrator", "proto": "internal call", "detail": "credential OK → check whether MFA is required for this user/org." },
+    { "from": "MFA Orchestrator", "to": "Challenge Client → api-challenge", "proto": "[REST] send OTP", "detail": "OTP issued; SMS path: api-challenge → [Kafka] → sms-processor → [HTTPS] AWS SNS." },
+    { "from": "End user", "to": "MFA Orchestrator", "proto": "[HTTPS] submit OTP", "detail": "user enters the code; orchestrator verifies it via api-challenge ✓." },
+    { "from": "Login Controller", "to": "Token / JWT Module", "proto": "internal call", "detail": "builds access + ID tokens for the authenticated subject." },
+    { "from": "Token / JWT Module", "to": "api-oauth2 / backend-auth", "proto": "[REST/Thrift] sign", "detail": "JWT signed by the key holder — the signing key never enters api-auth." },
+    { "from": "Session & Cookie Manager", "to": "backend-auth", "proto": "[Thrift] create session", "detail": "session persisted (KeyDB via backend); secure cookie prepared." },
+    { "from": "Echo Router", "to": "End user", "proto": "[HTTPS] 200 · Set-Cookie + tokens", "detail": "login complete — tokens returned, session cookie set.", "done": true }
+  ],
+  "relsTitle": "This is a C4 Dynamic view (runtime order) — it complements the static L3 component views.",
+  "rels": [
+    "L3 tells you <i>which components exist &amp; what depends on what</i>",
+    "Dynamic tells you <i>in what order they run</i> for one request"
+  ],
+  "refs": "runs across: <code>api-auth</code> (L3, §A2) · <code>backend-auth</code> (L3, §A6) · <code>api-challenge</code> · <code>api-oauth2</code> (L3, §A3) — zoom out: Container view <i>Auth &amp; Tokens</i> (L2)",
+  "caption": "Identity Platform · C4 Dynamic · Login + MFA + token issue — step order across api-auth components"
+}

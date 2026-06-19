@@ -1,0 +1,33 @@
+{
+  "preset": "c4-l3",
+  "id": "15-comp-api-gateway",
+  "eyebrow": "Component view (C4 L3) · api-gateway",
+  "title": "Inside api-gateway — ingress, JWT verify & PEP",
+  "subtitle": "box = <b>component</b> [technology] · arrow = <b>uses / calls</b> · single ingress; verifies every request then routes",
+  "callersLabel": "Callers · clients (context)",
+  "callers": ["person:Browser / SPA|‹person / app›|calls a protected API", "ext:OIDC RP / API client|‹external›|Bearer JWT"],
+  "conn": "[HTTPS] request + JWT",
+  "boundary": "‹container› api-gateway — [Go · echo · REST]",
+  "layers": [
+    { "l": "Edge", "c": 1, "center": true, "maxw": 560,
+      "cards": ["+Reverse Proxy / Router|[echo]|single ingress · routes /platform/<domain>/v1"],
+      "conn": "every request passes middleware" },
+    { "l": "Request middleware (before-request)", "c": 3,
+      "cards": ["+JWT Verifier|verifies against JWKS", "+Throttle / Rate-limit|KeyDB db4", "sec:+PEP · Access-Policy|calls PDP permit/deny"],
+      "conn": "if permitted → forward" },
+    { "l": "Cross-cutting", "c": 2,
+      "cards": ["+Activity Logger|request audit", "+Config & Env-Override Loader|[conf]|validated env"] }
+  ],
+  "downstreamConn": "[REST] verify · authorize · forward",
+  "downstreamLabel": "Downstream · other containers / datastore (context — each has its own L3)",
+  "downstreamCols": 4,
+  "downstream": ["ext:api-oauth2|[REST]|JWKS (verify token)", "sec:api-policy-enforcement|[REST]|PDP permit/deny", "ext:api-* upstreams|[REST]|routed services", "ds:KeyDB|[datastore]|throttle db4"],
+  "rels": [
+    "Router → before-request middleware: JWT Verifier checks the token against JWKS from api-oauth2",
+    "PEP (Access-Policy) → api-policy-enforcement (permit/deny) before forwarding",
+    "Throttle / Rate-limit → KeyDB db4",
+    "Permitted request → routed to the matching api-* service"
+  ],
+  "refs": "verifies tokens from <code>api-oauth2</code> (L3) · enforces via <code>api-policy-enforcement</code> (L3) — appears in Dynamic: <i>Policy decision</i> — zoom out: Container view <i>Access · Policy · Gateway</i> (L2)",
+  "caption": "Identity Platform · Component view · api-gateway (C4 L3) — components from action/ + config/"
+}

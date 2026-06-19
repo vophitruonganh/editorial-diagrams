@@ -1,0 +1,18 @@
+{
+  "preset": "dynamic",
+  "id": "31-dyn-oauth2-token",
+  "eyebrow": "C4 Dynamic · runtime flow — OAuth2 authorization-code + token",
+  "title": "Execution order: OAuth2 / OIDC code flow with PKCE",
+  "subtitle": "numbered steps = <b>runtime order</b> · each step = <b>component → component</b> + protocol · complements the api-oauth2 L3 (static)",
+  "steps": [
+    { "from": "RP app / browser", "to": "api-oauth2 /authorize", "proto": "[HTTPS] via nginx proxy", "detail": "redirected with client_id · scope · PKCE challenge — api-oauth2 is its own edge (NOT via api-gateway)" },
+    { "from": "api-oauth2", "to": "api-auth", "proto": "[REST] check session", "detail": "if no valid session → run the Login + MFA flow first" },
+    { "from": "api-oauth2 · Consent", "to": "End user", "proto": "[HTTPS] approve scopes", "detail": "user grants the requested scopes" },
+    { "from": "api-oauth2", "to": "backend-auth", "proto": "[Thrift] store auth code", "detail": "code bound to PKCE; browser redirected back to RP with the code" },
+    { "from": "RP app", "to": "api-oauth2 /token", "proto": "[HTTPS] exchange (via nginx proxy)", "detail": "auth code + PKCE verifier — straight to api-oauth2, not api-gateway" },
+    { "from": "api-oauth2", "to": "backend-auth", "proto": "[Thrift] validate + sign", "detail": "verify code + PKCE; sign JWT — the private key never leaves backend-auth" },
+    { "from": "api-oauth2", "to": "RP app", "proto": "[HTTPS] tokens", "detail": "returns access + ID + refresh tokens", "done": true }
+  ],
+  "refs": "runs across: <code>api-oauth2</code> (L3, §A3) · <code>api-auth</code> (L3, §A2) · <code>backend-auth</code> (L3, §A6) — via the nginx proxy edge (not api-gateway) — zoom out: Container view <i>Auth &amp; Tokens</i> (L2)",
+  "caption": "Identity Platform · C4 Dynamic · OAuth2 authorization-code + token issue — step order across api-oauth2 components"
+}

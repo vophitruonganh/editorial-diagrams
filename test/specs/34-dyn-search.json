@@ -1,0 +1,24 @@
+{
+  "preset": "dynamic",
+  "id": "34-dyn-search",
+  "eyebrow": "C4 Dynamic · runtime flow — Search (index + query)",
+  "title": "Execution order: how text-search uses Elasticsearch",
+  "subtitle": "<b>What ES is for:</b> full-text search over users / organizations / workspaces. <b>Two independent paths</b> — ①–③ <b>INDEX</b> (keep ES in sync with Mongo) · ④–⑦ <b>QUERY</b> (serve a search).",
+  "steps": [
+    { "from": "backend-* (Mongo `main`)", "to": "worker-*", "proto": "[Kafka] change event", "detail": "① INDEX — an entity (user / org / workspace) is created or changed in the source-of-truth Mongo." },
+    { "from": "worker-*", "to": "text-search · Document Indexer", "proto": "[REST] /document", "detail": "① INDEX — worker pushes the changed document to text-search." },
+    { "from": "text-search", "to": "Elasticsearch", "proto": "[ES HTTP] upsert", "detail": "① INDEX — Elasticsearch Client writes/updates the doc in the search index. ES is now in sync.", "done": true },
+    { "from": "End user / admin", "to": "api-* (e.g. api-admin)", "proto": "[HTTPS] search box", "detail": "② QUERY — user types a search (\"find a user / workspace\")." },
+    { "from": "api-*", "to": "text-search · Search Handler", "proto": "[REST] text_search_service", "detail": "② QUERY — api forwards the query string + scope." },
+    { "from": "text-search", "to": "Elasticsearch", "proto": "[ES HTTP] query", "detail": "② QUERY — Search Handler runs the full-text query against the index." },
+    { "from": "text-search", "to": "api-* → user", "proto": "[REST / HTTPS] ranked hits", "detail": "② QUERY — ranked results returned to the user.", "done": true }
+  ],
+  "relsTitle": "Why a separate index (Elasticsearch)?",
+  "rels": [
+    "MongoDB is great at exact lookups by id, not <i>full-text / ranked</i> search across many fields",
+    "Elasticsearch holds a <b>derived, rebuildable</b> index — Mongo `main` stays the source of truth",
+    "If ES is lost, <b>re-index</b> from Mongo (no data loss)"
+  ],
+  "refs": "static structure: <code>text-search</code> (L3, Part S) — callers: <code>api-admin</code> / <code>api-auth</code> / <code>api-workspace</code> / <code>worker-*</code> — zoom out: Container view <i>Supporting services</i> (L2, §7)",
+  "caption": "Identity Platform · C4 Dynamic · Search index + query — how text-search keeps and serves the Elasticsearch index"
+}

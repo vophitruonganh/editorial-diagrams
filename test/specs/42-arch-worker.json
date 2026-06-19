@@ -1,0 +1,29 @@
+{
+  "preset": "c4-l3",
+  "id": "42-arch-worker",
+  "eyebrow": "Component view (C4 L3) · archetype — worker-*",
+  "title": "Archetype — inside any worker-* consumer",
+  "subtitle": "box = <b>component</b> · arrow = <b>uses / calls</b> · the generic skeleton shared by the 6 Kafka workers (worker-auth, worker-provisioning …)",
+  "callersLabel": "Triggers (context)",
+  "callers": ["ds:Kafka|[event bus]|domain events", "ext:Scheduler / cron|‹internal›|timed triggers"],
+  "conn": "[Kafka] consume · timer",
+  "boundary": "‹container› worker-<service> — [Go · Kafka consumer] · archetype",
+  "layers": [
+    { "l": "Consumers & jobs (action/)", "c": 3,
+      "cards": ["+Kafka Consumer|action/event_bus|subscribes to topics", "+Scheduled Jobs|action/schedule|periodic tasks", "+Job Handlers|action/|process each event"],
+      "conn": "act via" },
+    { "l": "Integration", "c": 3,
+      "cards": ["+Backend Clients|backend/ + client/|[Thrift] / [REST]", "+Models|model/|local / queue state", "+Health + Config|api/ · conf/|liveness · env"],
+      "conn": "[Thrift] / [REST] / [mongo]" }
+  ],
+  "downstreamLabel": "Downstream (context — each has its own L3)",
+  "downstream": ["ext:backend-* / peer api-*|[Thrift]/[REST]|apply side-effects", "ds:MongoDB|[datastore]|queue / outbox state", "ext:Core (mail / sms)|[REST]|notifications"],
+  "rels": [
+    "Kafka Consumer → Job Handlers → Backend Clients (apply the change)",
+    "Scheduled Jobs run periodic reconciliation / cleanup",
+    "Outbox / queue state in MongoDB; notifications via Core (mail / sms)",
+    "Exposes a small health endpoint (api/) for liveness"
+  ],
+  "refs": "concrete examples: <code>worker-auth</code> · <code>worker-provisioning</code> (SCIM) · <code>worker-audit</code> … — pattern shared by 6 workers",
+  "caption": "Identity Platform · Component view · worker-* archetype (C4 L3) — generic skeleton from action/ + client/ + model/"
+}

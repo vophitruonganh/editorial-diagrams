@@ -1,0 +1,31 @@
+{
+  "preset": "c4-l3",
+  "id": "43-arch-frontend",
+  "eyebrow": "Component view (C4 L3) · archetype — frontend-*",
+  "title": "Archetype — inside any frontend-* portal",
+  "subtitle": "box = <b>component</b> · arrow = <b>uses / calls</b> · the generic Next.js skeleton shared by the portals (frontend-account, frontend-workspace …)",
+  "callersLabel": "User (context)",
+  "callers": ["person:End user (browser)|‹person›|loads the web app"],
+  "conn": "[HTTPS] page / API",
+  "boundary": "‹container› frontend-<app> — [Next.js · React] · archetype",
+  "layers": [
+    { "l": "UI layer", "c": 2,
+      "cards": ["+App Router Pages|src/app|routes · server/client components", "+React Components|UI · forms · widgets"],
+      "conn": "data via" },
+    { "l": "Data & auth", "c": 3,
+      "cards": ["+BFF / API Client|calls api-gateway", "+Auth / Session|OIDC tokens · cookies", "sec:+Build-time ENV|NEXT_PUBLIC_* baked at build"],
+      "conn": "served by" },
+    { "l": "Serving", "c": 1, "center": true, "maxw": 420,
+      "cards": ["+nginx|static assets + API proxy"] }
+  ],
+  "downstreamLabel": "Downstream (context — each has its own L3)",
+  "downstream": ["ext:api-gateway|[HTTPS / REST]|all backend calls", "ext:api-oauth2|[OIDC]|login / tokens"],
+  "rels": [
+    "App Router Pages → React Components → BFF / API Client → api-gateway",
+    "Auth / Session holds OIDC tokens (login via api-oauth2)",
+    "NEXT_PUBLIC_* values are baked at build time — the baked-URL surface",
+    "nginx serves static assets + proxies API calls"
+  ],
+  "refs": "concrete examples: <code>frontend-account</code> · <code>frontend-organization</code> · <code>frontend-workspace</code> · <code>frontend-admin</code> — pattern shared by the portals",
+  "caption": "Identity Platform · Component view · frontend-* archetype (C4 L3) — generic Next.js skeleton from src/app + components + BFF"
+}

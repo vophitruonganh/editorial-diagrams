@@ -1,0 +1,19 @@
+{
+  "preset": "dynamic",
+  "id": "33-dyn-policy-decision",
+  "eyebrow": "C4 Dynamic · runtime flow — Policy decision (PEP → PDP)",
+  "title": "Execution order: authorizing a protected request",
+  "subtitle": "numbered steps = <b>runtime order</b> · each step = <b>component → component</b> + protocol · complements the api-gateway & api-policy-enforcement L3",
+  "steps": [
+    { "from": "Client", "to": "api-gateway", "proto": "[HTTPS] request + JWT", "detail": "calls a protected api-* endpoint" },
+    { "from": "api-gateway · JWT Verifier", "detail": "validates the token against JWKS from api-oauth2" },
+    { "from": "api-gateway · PEP", "to": "api-policy-enforcement", "proto": "[REST] /decision", "detail": "sends subject · resource · action · context" },
+    { "from": "PDP · Decision Controller", "to": "Policy Evaluation Engine", "proto": "evaluate", "detail": "applies the matching policies" },
+    { "from": "PDP", "to": "Policy Cache (KeyDB db3)", "proto": "[RESP] lookup", "detail": "on miss → backend-organization policy data" },
+    { "from": "PDP · Context-Aware Eval", "to": "geoip-lookup (Core)", "proto": "[REST] geo", "detail": "geo · device · risk signals" },
+    { "from": "PDP", "to": "api-audit", "proto": "[REST] audit", "detail": "permit / deny decision recorded" },
+    { "from": "api-gateway", "to": "api-* upstream / Client", "proto": "[HTTPS]", "detail": "permit → forward to upstream · deny → 403", "done": true }
+  ],
+  "refs": "runs across: <code>api-gateway</code> PEP (L3, §A1) · <code>api-policy-enforcement</code> PDP (L3, §A5) — zoom out: Container view <i>Access · Policy · Gateway</i> (L2)",
+  "caption": "Identity Platform · C4 Dynamic · Policy decision (PEP → PDP) — step order across gateway & PDP components"
+}

@@ -1,0 +1,33 @@
+{
+  "preset": "c4-l3",
+  "id": "14-comp-api-oauth2",
+  "eyebrow": "Component view (C4 L3) · api-oauth2",
+  "title": "Inside api-oauth2 — the OIDC / OAuth2 Authorization Server",
+  "subtitle": "box = <b>component</b> [technology] · arrow = <b>uses / calls</b> · issues tokens; the private signing key stays in backend-auth",
+  "callersLabel": "Callers · edge + internal (context — each has its own L3)",
+  "callers": ["ext:nginx proxy|[HTTPS] RP apps / browser — direct edge", "ext:api-auth|[REST] token issuance", "ext:api-saml2|[REST] token_service"],
+  "conn": "[HTTPS] / [REST] OIDC endpoints — NOT via api-gateway",
+  "boundary": "‹container› api-oauth2 — [Go · echo · REST]",
+  "layers": [
+    { "l": "API layer", "c": 1, "center": true, "maxw": 560,
+      "cards": ["+Echo Router + Middleware|[go-common]|routes /authorize /token /introspect /userinfo /jwks"],
+      "conn": "dispatch to endpoint" },
+    { "l": "OIDC / OAuth2 endpoint controllers", "c": 3,
+      "cards": ["+/authorize|consent · auth code", "+/token|grants: code+PKCE · refresh · client-cred · device", "+/introspect · /revoke|token state", "+/userinfo|ID claims", "sec:+Discovery + JWKS|publishes public keys", "+Consent|granted scopes"],
+      "conn": "read clients / codes · request signing" },
+    { "l": "Integration", "c": 1, "center": true, "maxw": 520,
+      "cards": ["+Auth Backend Client|[Thrift client]|→ backend-auth: clients · codes · consent · signing key"],
+      "conn": "[Thrift :80] · [RESP]" }
+  ],
+  "downstreamLabel": "Downstream · containers / datastore (context — each has its own L3)",
+  "downstream": ["ext:backend-auth|[Thrift backend]|clients · codes · JWT signing key", "ds:KeyDB|[datastore · Redis]|token / code state · SSO blacklist", "ext:api-auth|[REST]|session at /authorize"],
+  "rels": [
+    "/authorize → api-auth (session) → Consent → issues an auth code",
+    "/token → Auth Backend Client → backend-auth signs the JWT (private key never leaves backend-auth)",
+    "Discovery + JWKS publishes the public keys api-gateway uses to verify",
+    "/introspect · /revoke → KeyDB token state · SSO blacklist"
+  ],
+  "note": "api-oauth2 is its own public edge behind the nginx proxy — a <b>peer of api-gateway, not behind it</b>; token / discovery / JWKS endpoints do not pass through api-gateway.",
+  "refs": "signing key held by <code>backend-auth</code> (L3) · session from <code>api-auth</code> (L3) — appears in Dynamic: <i>OAuth2 token</i> · <i>Login + MFA</i> — zoom out: Container view <i>Auth &amp; Tokens</i> (L2)",
+  "caption": "Identity Platform · Component view · api-oauth2 (C4 L3) — components from api/ + action/ + client/"
+}

@@ -1,0 +1,32 @@
+{
+  "preset": "c4-l3",
+  "id": "27-comp-api-policy-enforcement",
+  "eyebrow": "Component view (C4 L3) · api-policy-enforcement",
+  "title": "Inside api-policy-enforcement — the Policy Decision Point (PDP)",
+  "subtitle": "box = <b>component</b> [technology] · arrow = <b>uses / calls</b> · evaluates permit/deny for the gateway PEP",
+  "callers": ["ext:api-gateway · PEP|[REST]|asks permit/deny", "ext:api-* services|[REST]|authorization checks"],
+  "conn": "[REST] /decision · permit / deny",
+  "boundary": "‹container› api-policy-enforcement — [Go · echo · REST] · PDP",
+  "layers": [
+    { "l": "API layer", "c": 1, "center": true, "maxw": 540,
+      "cards": ["+Decision Controller|policy_enforcement.go · permit / deny"],
+      "conn": "evaluate" },
+    { "l": "Policy decision engine", "c": 3,
+      "cards": ["+Policy Evaluation Engine|decision_engine.go", "+Context-Aware Evaluation|geo · device · risk", "+Sensitive-Fields Filter|response redaction"],
+      "conn": "load policy · cache · audit" },
+    { "l": "Data & integration", "c": 4,
+      "cards": ["+Policy Cache|cache.go → KeyDB db3", "+Policy / Backend Client|→ backend-organization", "+GeoIP Client|→ Core geoip-lookup", "+Audit Client|→ api-audit"],
+      "conn": "[Thrift] / [REST] / [RESP]" }
+  ],
+  "downstreamLabel": "Downstream · containers / datastores + Core (context)",
+  "downstreamCols": 5,
+  "downstream": ["ext:backend-organization|[Thrift]|policy data", "ds:KeyDB|[datastore · Redis]|policy cache db3", "ds:MongoDB|[datastore]|policy / decision store", "ext:geoip-lookup|[REST]|Core · geo-IP", "ext:api-audit|[REST]|decision audit"],
+  "rels": [
+    "Decision Controller → Policy Evaluation Engine → permit / deny",
+    "Engine → Context-Aware Evaluation (geo via Core geoip-lookup · device · risk)",
+    "Engine → Policy Cache (KeyDB db3); on miss → backend-organization policy data",
+    "Decisions emitted to api-audit · sensitive fields redacted in responses"
+  ],
+  "refs": "called by <code>api-gateway</code> PEP (L3) — deps from api-policy-enforcement/dev.config.yaml — appears in Dynamic: <i>Policy decision</i> — zoom out: Container view <i>Access · Policy · Gateway</i> (L2)",
+  "caption": "Identity Platform · Component view · api-policy-enforcement (C4 L3 · PDP) — components from action/policy_enforcement/"
+}
