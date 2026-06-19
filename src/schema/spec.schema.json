@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Editorial diagram spec",
+  "type": "object",
+  "required": ["title"],
+  "properties": {
+    "preset": { "enum": ["c4-l3", "c4-l2", "dynamic"] },
+    "id": { "type": "string" },
+    "eyebrow": { "type": "string" },
+    "title": { "type": "string" },
+    "subtitle": { "type": "string" },
+    "caption": { "type": "string" },
+    "blocks": { "type": "array" },
+    "callers": { "type": "array" },
+    "layers": { "type": "array" },
+    "downstream": {},
+    "steps": { "type": "array" },
+    "rels": { "type": "array" },
+    "refs": { "type": "string" }
+  }
+}
