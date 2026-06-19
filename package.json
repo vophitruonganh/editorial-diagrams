@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "description": "MCP server that renders editorial-style architecture diagrams from a compact JSON spec.",
   "type": "module",
-  "bin": { "editorial-diagrams-mcp": "src/server.mjs" },
-  "engines": { "node": ">=18" },
+  "bin": {
+    "editorial-diagrams-mcp": "src/server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "test": "node --test",
     "start": "node src/server.mjs"
   },
   "dependencies": {
+    "@dagrejs/dagre": "^3.0.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "@puppeteer/browsers": "^2.4.0",
     "puppeteer-core": "^23.0.0",

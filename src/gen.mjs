@@ -14,6 +14,8 @@
 //   {caption:"..."}                                → bottom caption
 // Card: "Name" or {h, stereo?, tech?, p?, kind?}   kind ∈ person|ext|ds|jewel|sec|muted
 
+import { renderChrome } from './chrome.mjs';
+
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 const KINDS = ['ext', 'ds', 'jewel', 'sec', 'muted', 'person'];
@@ -101,15 +103,8 @@ function renderBlock(b) {
   return '';
 }
 export function build(spec, css) {
-  let h = `<!doctype html><html><head><meta charset="utf-8"><style>\n${css}\n</style></head><body>\n<div class="diagram">`;
-  h += `\n  <div class="eyebrow">${esc(spec.eyebrow)}</div>`;
-  h += `\n  <div class="title">${esc(spec.title)}</div>`;
-  if (spec.subtitle) h += `\n  <div class="subtitle">${spec.subtitle}</div>`;
-  h += `\n  <div class="rule"></div>`;
-  h += (spec.blocks || []).map(renderBlock).join('');
-  if (spec.caption) h += `\n  <div class="caption">${esc(spec.caption)}</div>`;
-  h += `\n</div>\n</body></html>\n`;
-  return h;
+  const body = (spec.blocks || []).map(renderBlock).join('');
+  return renderChrome(spec, body, css);
 }
 
 // ── reusable partials ────────────────────────────────────────────────────────
