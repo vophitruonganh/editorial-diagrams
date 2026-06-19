@@ -47,6 +47,50 @@ export function arrowMarkerDefs(id = 'arrow', color = AMBER) {
     `<path d="M0,0 L10,5 L0,10 z" fill="${color}"/></marker></defs>`;
 }
 
+// ── edge-end glyphs ──────────────────────────────────────────────────────────
+// Each glyph is drawn at boundary point P with D = unit vector pointing INTO the node.
+const perpOf = D => ({ x: -D.y, y: D.x });
+const END_GLYPHS = {};
+export function registerEdgeEnd(kind, fn) { END_GLYPHS[kind] = fn; }
+export function edgeEndGlyph(kind, P, D, color = AMBER) {
+  const fn = END_GLYPHS[kind];
+  return fn ? fn(P, D, color) : '';
+}
+
+// filled arrowhead pointing into the node
+registerEdgeEnd('arrow', (P, D, c) => {
+  const pr = perpOf(D), b = { x: P.x - D.x * 9, y: P.y - D.y * 9 };
+  return `<polygon points="${f(P.x)},${f(P.y)} ${f(b.x + pr.x * 4.5)},${f(b.y + pr.y * 4.5)} ${f(b.x - pr.x * 4.5)},${f(b.y - pr.y * 4.5)}" fill="${c}"/>`;
+});
+
+// ERD crow's-foot cardinality (one ─┤ · many ─< · optional zero ○)
+function crow(P, D, c, kind) {
+  const perp = perpOf(D);
+  const sw = `stroke="${c}" stroke-width="2" stroke-linecap="round" fill="none"`;
+  const at = (dd, pp = 0) => ({ x: P.x - D.x * dd + perp.x * pp, y: P.y - D.y * dd + perp.y * pp });
+  let s = '';
+  const many = kind.includes('many'), zero = kind.includes('zero');
+  if (many) { const apex = at(13); for (const sgn of [8, -8, 0]) s += `<line x1="${f(apex.x)}" y1="${f(apex.y)}" x2="${f(P.x + perp.x * sgn)}" y2="${f(P.y + perp.y * sgn)}" ${sw}/>`; }
+  else { const cc = at(10); s += `<line x1="${f(cc.x + perp.x * 8)}" y1="${f(cc.y + perp.y * 8)}" x2="${f(cc.x - perp.x * 8)}" y2="${f(cc.y - perp.y * 8)}" ${sw}/>`; }
+  if (zero) { const o = at(many ? 22 : 20); s += `<circle cx="${f(o.x)}" cy="${f(o.y)}" r="5" fill="#fff" stroke="${c}" stroke-width="2"/>`; }
+  return s;
+}
+for (const k of ['one', 'many', 'zero-one', 'zero-many']) registerEdgeEnd('crow-' + k, (P, D, c) => crow(P, D, c, k));
+
+// UML inheritance: hollow triangle, apex at the parent
+registerEdgeEnd('triangle', (P, D, c) => {
+  const pr = perpOf(D), b = { x: P.x - D.x * 13, y: P.y - D.y * 13 };
+  return `<polygon points="${f(P.x)},${f(P.y)} ${f(b.x + pr.x * 7)},${f(b.y + pr.y * 7)} ${f(b.x - pr.x * 7)},${f(b.y - pr.y * 7)}" fill="#fff" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`;
+});
+
+// UML aggregation (hollow) / composition (filled): diamond on the whole/owner side
+function diamond(P, D, c, fill) {
+  const pr = perpOf(D), mid = { x: P.x - D.x * 8, y: P.y - D.y * 8 }, far = { x: P.x - D.x * 16, y: P.y - D.y * 16 };
+  return `<polygon points="${f(P.x)},${f(P.y)} ${f(mid.x + pr.x * 6)},${f(mid.y + pr.y * 6)} ${f(far.x)},${f(far.y)} ${f(mid.x - pr.x * 6)},${f(mid.y - pr.y * 6)}" fill="${fill}" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`;
+}
+registerEdgeEnd('diamond', (P, D, c) => diamond(P, D, c, '#fff'));
+registerEdgeEnd('diamond-filled', (P, D, c) => diamond(P, D, c, c));
+
 export function edgeLabelChip(point, text) {
   const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const w = String(text).length * 6.5 + 14;

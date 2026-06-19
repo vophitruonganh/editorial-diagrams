@@ -1,0 +1,19 @@
+{
+  "type": "class",
+  "id": "class-domain",
+  "eyebrow": "UML · Class diagram",
+  "title": "Auth domain — classes",
+  "subtitle": "△ inheritance · ◇ aggregation · ◆ composition",
+  "nodes": [
+    { "id": "User", "kind": "class", "name": "User", "attributes": ["id: UUID", "email: string"], "methods": ["authenticate()", "resetPassword()"] },
+    { "id": "Admin", "kind": "class", "name": "Admin", "attributes": ["scope: string"], "methods": ["grant()"] },
+    { "id": "Account", "kind": "class", "name": "Account", "attributes": ["plan: string"], "methods": ["activate()"] },
+    { "id": "Session", "kind": "class", "name": "Session", "attributes": ["token: string", "expiresAt: Date"], "methods": ["revoke()"] }
+  ],
+  "edges": [
+    { "from": "Admin", "to": "User", "endTo": "triangle", "arrow": false, "label": "extends" },
+    { "from": "Account", "to": "User", "endFrom": "diamond", "arrow": false, "label": "owns" },
+    { "from": "User", "to": "Session", "endFrom": "diamond-filled", "arrow": false, "label": "has" }
+  ],
+  "caption": "Identity Platform · UML Class — auth domain"
+}

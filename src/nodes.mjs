@@ -20,10 +20,19 @@ export function cardNode(dsl, geom) {
   return `<div class="${cls}" style="${style}">${stereo}<h4>${esc(c.h)}</h4>${tech}${p}</div>`;
 }
 
-// Extensible node-kind dispatch. Later phases register diamond/entity-table/etc.
-const RENDERERS = { card: (n, geom) => cardNode(n.card ?? n.label ?? '', geom) };
-export function registerNode(kind, fn) { RENDERERS[kind] = fn; }
+// Extensible node-kind dispatch. Each kind registers a renderer and (optionally)
+// a sizer so the layout engine can size it (entity tables, diamonds, bars differ).
+const RENDERERS = {};
+const SIZERS = {};
+export function registerNode(kind, render, size) { RENDERERS[kind] = render; if (size) SIZERS[kind] = size; }
 export function renderNode(node, geom) { return (RENDERERS[node.kind] || RENDERERS.card)(node, geom); }
+export function nodeSize(node, fallback) {
+  if (node.w && node.h) return { w: node.w, h: node.h };
+  const s = SIZERS[node.kind];
+  return s ? s(node) : fallback;
+}
 export function hasNodeKind(kind) { return Boolean(RENDERERS[kind]); }
+
+registerNode('card', (n, geom) => cardNode(n.card ?? n.label ?? '', geom));
 
 export { esc, posStyle };

@@ -1,0 +1,19 @@
+{
+  "type": "erd",
+  "id": "erd-core",
+  "eyebrow": "Data model · ERD",
+  "title": "Identity Platform — core entities",
+  "subtitle": "box = <b>entity</b> · crow's-foot = cardinality · PK/FK marked",
+  "nodes": [
+    { "id": "ORG", "kind": "entity", "name": "ORG", "fields": [["id", "uuid", "pk"], ["name", "string"], ["slug", "string"]] },
+    { "id": "USER", "kind": "entity", "name": "USER", "fields": [["id", "uuid", "pk"], ["org_id", "uuid", "fk"], ["email", "string"], ["status", "string"]] },
+    { "id": "SESSION", "kind": "entity", "name": "SESSION", "fields": [["id", "uuid", "pk"], ["user_id", "uuid", "fk"], ["expires_at", "timestamp"]] },
+    { "id": "CREDENTIAL", "kind": "entity", "name": "CREDENTIAL", "fields": [["id", "uuid", "pk"], ["user_id", "uuid", "fk"], ["type", "string"]] }
+  ],
+  "edges": [
+    { "from": "ORG", "to": "USER", "endFrom": "crow-one", "endTo": "crow-many", "arrow": false },
+    { "from": "USER", "to": "SESSION", "endFrom": "crow-one", "endTo": "crow-many", "arrow": false },
+    { "from": "USER", "to": "CREDENTIAL", "endFrom": "crow-one", "endTo": "crow-many", "arrow": false }
+  ],
+  "caption": "Identity Platform · ERD — core entities"
+}

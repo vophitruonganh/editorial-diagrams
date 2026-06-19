@@ -1,12 +1,14 @@
 // Single source of truth for which diagram `type` routes to which engine.
 // Each build phase appends the types it implements (engine + validation stay in sync).
 //
-// Phase A: flowchart (graph engine).
-// Phase B will append: activity, state, erd, class, dependency, call-graph,
-//   network, mindmap, org-chart, decision-tree, knowledge-graph, data-lineage.
+// Phase A: flowchart. Phase B: + UML/ERD/class/trees/graphs (all graph engine).
 // Phase C: git-workflow, timeline, gantt, user-journey (lane engine).
 // Phase D: sequence, communication (sequence engine).
-export const GRAPH_TYPES = ['flowchart'];
+export const GRAPH_TYPES = [
+  'flowchart', 'activity', 'state', 'erd', 'class',
+  'dependency', 'call-graph', 'network', 'mindmap',
+  'org-chart', 'decision-tree', 'knowledge-graph', 'data-lineage',
+];
 export const LANE_TYPES = [];
 export const SEQUENCE_TYPES = [];
 

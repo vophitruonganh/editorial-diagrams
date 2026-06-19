@@ -1,0 +1,38 @@
+{
+  "type": "activity",
+  "id": "activity-login",
+  "eyebrow": "UML · Activity diagram",
+  "title": "Login + MFA — activity flow",
+  "subtitle": "● start · ◇ decision · ▭ action · ▬ fork/join · ◉ end",
+  "nodes": [
+    { "id": "s", "kind": "start" },
+    { "id": "submit", "card": "Submit credentials|email + password" },
+    { "id": "valid", "kind": "decision", "label": "Valid?" },
+    { "id": "err", "card": "sec:Show error|401 / 403" },
+    { "id": "mfa", "card": "Verify MFA|TOTP / WebAuthn" },
+    { "id": "mfaok", "kind": "decision", "label": "MFA ok?" },
+    { "id": "issue", "card": "sec:Issue token|JWT" },
+    { "id": "fork", "kind": "fork" },
+    { "id": "audit", "card": "Write audit log|→ api-audit" },
+    { "id": "email", "card": "Send welcome email|→ mail-processor" },
+    { "id": "join", "kind": "join" },
+    { "id": "e", "kind": "end" }
+  ],
+  "edges": [
+    { "from": "s", "to": "submit" },
+    { "from": "submit", "to": "valid" },
+    { "from": "valid", "to": "mfa", "label": "yes" },
+    { "from": "valid", "to": "err", "label": "no" },
+    { "from": "mfa", "to": "mfaok" },
+    { "from": "mfaok", "to": "issue", "label": "yes" },
+    { "from": "mfaok", "to": "err", "label": "no" },
+    { "from": "issue", "to": "fork" },
+    { "from": "fork", "to": "audit" },
+    { "from": "fork", "to": "email" },
+    { "from": "audit", "to": "join" },
+    { "from": "email", "to": "join" },
+    { "from": "join", "to": "e" },
+    { "from": "err", "to": "e" }
+  ],
+  "caption": "Identity Platform · UML Activity — login + MFA"
+}
