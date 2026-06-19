@@ -2,7 +2,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { renderDiagram, validateSpecTool, describeSchemaTool } from './tools.mjs';
+import { renderDiagram, validateSpecTool, describeSchemaTool, scaffoldSpecTool, listExamplesTool, getExampleTool } from './tools.mjs';
 
 const specSchema = z.record(z.any());
 
@@ -25,7 +25,7 @@ export function buildServer(server) {
         width: z.number().min(320).max(4000).optional(),
         out_path: z.string().optional(),
         transparent: z.boolean().optional(),
-        return_image: z.boolean().optional(),
+        return_image: z.union([z.boolean(), z.enum(['auto', 'full', 'none'])]).optional(),
       },
     },
     (args) => renderDiagram(args),
@@ -49,6 +49,36 @@ export function buildServer(server) {
       inputSchema: { topic: z.enum(['cards', 'blocks', 'presets']).optional(), type: z.string().optional() },
     },
     (args) => describeSchemaTool(args),
+  );
+
+  server.registerTool(
+    'scaffold_spec',
+    {
+      title: 'Scaffold a diagram spec',
+      description: 'Write a starter spec skeleton for a diagram `type` (to `out_path` if given). Edit the placeholders, then render. Saves authoring tokens vs writing the spec from scratch.',
+      inputSchema: { type: z.string(), out_path: z.string().optional() },
+    },
+    (args) => scaffoldSpecTool(args),
+  );
+
+  server.registerTool(
+    'list_examples',
+    {
+      title: 'List example specs',
+      description: 'List the bundled example/golden specs (id · type · title). Use get_example to fetch one as a starting point.',
+      inputSchema: {},
+    },
+    () => listExamplesTool(),
+  );
+
+  server.registerTool(
+    'get_example',
+    {
+      title: 'Get an example spec',
+      description: 'Return a bundled example spec by id (from list_examples) — copy + edit it instead of authoring from scratch.',
+      inputSchema: { id: z.string() },
+    },
+    (args) => getExampleTool(args),
   );
 
   return server;
