@@ -1,0 +1,28 @@
+{
+  "type": "git-workflow",
+  "id": "git-gitflow",
+  "eyebrow": "Git workflow · GitFlow",
+  "title": "Branching strategy — feature → develop → main",
+  "subtitle": "lane = <b>branch</b> · dot = <b>commit</b> · curve = <b>branch / merge</b>",
+  "lanes": [
+    { "id": "main", "label": "main", "color": "#1F2B45" },
+    { "id": "develop", "label": "develop", "color": "#4F46E5" },
+    { "id": "feature", "label": "feature/login", "color": "#b45309" }
+  ],
+  "commits": [
+    { "branch": "main", "t": 0, "label": "init" },
+    { "branch": "develop", "t": 1 },
+    { "branch": "develop", "t": 2 },
+    { "branch": "feature", "t": 3 },
+    { "branch": "feature", "t": 4 },
+    { "branch": "develop", "t": 6, "label": "merge feature" },
+    { "branch": "main", "t": 7, "label": "v1.0" }
+  ],
+  "links": [
+    { "type": "branch", "from": { "branch": "main", "t": 0 }, "to": { "branch": "develop", "t": 1 } },
+    { "type": "branch", "from": { "branch": "develop", "t": 2 }, "to": { "branch": "feature", "t": 3 } },
+    { "type": "merge", "from": { "branch": "feature", "t": 4 }, "to": { "branch": "develop", "t": 6 } },
+    { "type": "merge", "from": { "branch": "develop", "t": 6 }, "to": { "branch": "main", "t": 7 } }
+  ],
+  "caption": "Identity Platform · Git workflow — GitFlow"
+}

@@ -1,0 +1,13 @@
+{
+  "type": "timeline",
+  "id": "timeline-roadmap",
+  "eyebrow": "Roadmap",
+  "title": "Release roadmap",
+  "events": [
+    { "at": "Q1", "title": "MVP", "detail": "core auth" },
+    { "at": "Q2", "title": "MFA", "detail": "TOTP + WebAuthn" },
+    { "at": "Q3", "title": "SSO", "detail": "SAML + OIDC" },
+    { "at": "Q4", "title": "GA", "detail": "v1.0" }
+  ],
+  "caption": "Identity Platform · Release roadmap"
+}

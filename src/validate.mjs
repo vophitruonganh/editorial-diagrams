@@ -1,6 +1,31 @@
-import { GRAPH_TYPES } from './types.mjs';
+import { GRAPH_TYPES, LANE_TYPES } from './types.mjs';
 
 const PRESETS = ['c4-l3', 'c4-l2', 'dynamic'];
+
+const LANE_REQUIRED = {
+  'git-workflow': ['lanes', 'commits'],
+  'timeline': ['events'],
+  'gantt': ['tasks'],
+  'user-journey': ['stages'],
+};
+
+function validateLane(spec) {
+  const errors = [];
+  for (const key of LANE_REQUIRED[spec.type] || []) {
+    if (!Array.isArray(spec[key]) || spec[key].length === 0) errors.push(`\`${key}\` must be a non-empty array for type "${spec.type}"`);
+  }
+  if (spec.type === 'gantt') {
+    (spec.tasks || []).forEach((t, i) => {
+      if (!t || typeof t.start !== 'number' || typeof t.end !== 'number') errors.push(`tasks[${i}] needs numeric \`start\` and \`end\``);
+      else if (t.end < t.start) errors.push(`tasks[${i}].end < start`);
+    });
+  }
+  if (spec.type === 'git-workflow') {
+    const ids = new Set((spec.lanes || []).map(l => l && l.id));
+    (spec.commits || []).forEach((c, i) => { if (!c || !ids.has(c.branch)) errors.push(`commits[${i}].branch "${c && c.branch}" is not a declared lane`); });
+  }
+  return errors;
+}
 
 function validateGraph(spec) {
   const errors = [];
@@ -34,6 +59,11 @@ export function validateSpec(spec) {
   // graph-engine types validate by nodes/edges
   if (GRAPH_TYPES.includes(spec.type)) {
     errors.push(...validateGraph(spec));
+    return { valid: errors.length === 0, errors };
+  }
+  // lane/time-engine types validate by their required arrays
+  if (LANE_TYPES.includes(spec.type)) {
+    errors.push(...validateLane(spec));
     return { valid: errors.length === 0, errors };
   }
 

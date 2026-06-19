@@ -1,0 +1,15 @@
+{
+  "type": "user-journey",
+  "id": "journey-signup",
+  "eyebrow": "UX · User journey",
+  "title": "Signup journey",
+  "subtitle": "line = <b>sentiment</b> across stages",
+  "stages": [
+    { "name": "Land", "sentiment": 3, "detail": "marketing page" },
+    { "name": "Sign up", "sentiment": 2, "detail": "form friction" },
+    { "name": "Verify email", "sentiment": 2, "detail": "waits for code" },
+    { "name": "Onboard", "sentiment": 4, "detail": "guided setup" },
+    { "name": "First value", "sentiment": 5, "detail": "first project" }
+  ],
+  "caption": "Identity Platform · Signup journey"
+}

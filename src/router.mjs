@@ -2,10 +2,12 @@
 // which keeps every existing C4/preset spec working unchanged.
 import { renderSpec } from './gen.mjs';
 import { renderGraph } from './engines/graph.mjs';
-import { GRAPH_TYPES } from './types.mjs';
+import { renderLane } from './engines/lane.mjs';
+import { GRAPH_TYPES, LANE_TYPES } from './types.mjs';
 
 const ENGINES = {};
 for (const t of GRAPH_TYPES) ENGINES[t] = renderGraph;
+for (const t of LANE_TYPES) ENGINES[t] = renderLane;
 
 // Later phases register their engines here (lane, sequence).
 export function registerEngine(type, fn) { ENGINES[type] = fn; }

@@ -1,5 +1,12 @@
 import { readFileSync } from 'node:fs';
-import { GRAPH_TYPES } from './types.mjs';
+import { GRAPH_TYPES, LANE_TYPES } from './types.mjs';
+
+const laneCheatsheets = {
+  'git-workflow': '{ type:"git-workflow", title, lanes:[{id,label,color?}], commits:[{branch,t,label?}], links:[{type:"branch"|"merge", from:{branch,t}, to:{branch,t}}] }  // t = time index',
+  'timeline': '{ type:"timeline", title, events:[{title, detail?, at?}] }  // events laid left→right',
+  'gantt': '{ type:"gantt", title, unit?, tasks:[{name, start, end, color?}] }  // start/end are numeric units',
+  'user-journey': '{ type:"user-journey", title, stages:[{name, sentiment:1..5, detail?}] }',
+};
 
 const schema = JSON.parse(readFileSync(new URL('./schema/spec.schema.json', import.meta.url)));
 const graphSchema = JSON.parse(readFileSync(new URL('./schema/graph.schema.json', import.meta.url)));
@@ -13,6 +20,7 @@ const graphCheatsheet =
 // Returns the schema + cheat-sheet for a given diagram type (graph types → graph schema).
 export function describeForType(type) {
   if (GRAPH_TYPES.includes(type)) return { schema: graphSchema, cheatsheet: graphCheatsheet };
+  if (LANE_TYPES.includes(type)) return { schema: {}, cheatsheet: laneCheatsheets[type] || Object.values(laneCheatsheets).join('\n') };
   return { schema, cheatsheet: describeSpecSchema().cheatsheet };
 }
 
