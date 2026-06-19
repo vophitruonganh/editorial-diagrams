@@ -1,4 +1,17 @@
-import { GRAPH_TYPES, LANE_TYPES } from './types.mjs';
+import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES } from './types.mjs';
+
+const GRID_REQUIRED = { matrix: ['rows'], quadrant: ['items'], kanban: ['columns'], swimlane: ['lanes', 'steps'] };
+function validateGrid(spec) {
+  const errors = [];
+  for (const key of GRID_REQUIRED[spec.type] || []) {
+    if (!Array.isArray(spec[key]) || spec[key].length === 0) errors.push(`\`${key}\` must be a non-empty array for type "${spec.type}"`);
+  }
+  if (spec.type === 'swimlane') {
+    const ids = new Set((spec.lanes || []).map(l => l && l.id));
+    (spec.steps || []).forEach((s, i) => { if (!s || !ids.has(s.lane)) errors.push(`steps[${i}].lane "${s && s.lane}" is not a declared lane`); });
+  }
+  return errors;
+}
 
 const PRESETS = ['c4-l3', 'c4-l2', 'dynamic'];
 
@@ -64,6 +77,11 @@ export function validateSpec(spec) {
   // lane/time-engine types validate by their required arrays
   if (LANE_TYPES.includes(spec.type)) {
     errors.push(...validateLane(spec));
+    return { valid: errors.length === 0, errors };
+  }
+  // grid-engine types
+  if (GRID_TYPES.includes(spec.type)) {
+    errors.push(...validateGrid(spec));
     return { valid: errors.length === 0, errors };
   }
 

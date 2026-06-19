@@ -1,0 +1,13 @@
+{
+  "type": "kanban",
+  "id": "kanban-board",
+  "eyebrow": "Board",
+  "title": "Sprint board",
+  "columns": [
+    { "title": "Todo", "cards": ["MFA UI|figma ready", "Audit log"] },
+    { "title": "In progress", "cards": ["sec:Token rotation|backend"] },
+    { "title": "Review", "cards": ["SSO config"] },
+    { "title": "Done", "cards": ["Login flow", "Password reset"] }
+  ],
+  "caption": "Identity Platform · sprint board"
+}

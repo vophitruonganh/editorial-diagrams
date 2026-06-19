@@ -1,5 +1,12 @@
 import { readFileSync } from 'node:fs';
-import { GRAPH_TYPES, LANE_TYPES } from './types.mjs';
+import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES } from './types.mjs';
+
+const gridCheatsheets = {
+  matrix: '{ type:"matrix", title, cols:[..headers..], rows:[{label, cells:[..]}] }',
+  quadrant: '{ type:"quadrant", title, xAxis:[left,right], yAxis:[bottom,top], quadrants?:[tl,tr,bl,br], items:[{label, x:0..1, y:0..1}] }',
+  kanban: '{ type:"kanban", title, columns:[{title, cards:["Card DSL", ...]}] }',
+  swimlane: '{ type:"swimlane", title, lanes:[{id,label}], steps:[{id,lane,t,card}], edges:[{from,to,label?}] }  // t = column index',
+};
 
 const laneCheatsheets = {
   'git-workflow': '{ type:"git-workflow", title, lanes:[{id,label,color?}], commits:[{branch,t,label?}], links:[{type:"branch"|"merge", from:{branch,t}, to:{branch,t}}] }  // t = time index',
@@ -21,6 +28,7 @@ const graphCheatsheet =
 export function describeForType(type) {
   if (GRAPH_TYPES.includes(type)) return { schema: graphSchema, cheatsheet: graphCheatsheet };
   if (LANE_TYPES.includes(type)) return { schema: {}, cheatsheet: laneCheatsheets[type] || Object.values(laneCheatsheets).join('\n') };
+  if (GRID_TYPES.includes(type)) return { schema: {}, cheatsheet: gridCheatsheets[type] || Object.values(gridCheatsheets).join('\n') };
   return { schema, cheatsheet: describeSpecSchema().cheatsheet };
 }
 

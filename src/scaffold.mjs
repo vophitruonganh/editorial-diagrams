@@ -17,6 +17,10 @@ const SCAFFOLDS = {
   timeline: () => ({ type: 'timeline', title: '<title>', events: [{ at: 'Q1', title: 'Milestone A', detail: '...' }, { at: 'Q2', title: 'Milestone B' }] }),
   gantt: () => ({ type: 'gantt', title: '<title>', tasks: [{ name: 'Task A', start: 0, end: 3 }, { name: 'Task B', start: 3, end: 6 }] }),
   'user-journey': () => ({ type: 'user-journey', title: '<title>', stages: [{ name: 'Stage 1', sentiment: 3 }, { name: 'Stage 2', sentiment: 4 }] }),
+  matrix: () => ({ type: 'matrix', title: '<title>', cols: ['Col A', 'Col B'], rows: [{ label: 'Row 1', cells: ['x', 'y'] }, { label: 'Row 2', cells: ['a', 'b'] }] }),
+  quadrant: () => ({ type: 'quadrant', title: '<title>', xAxis: ['low', 'high'], yAxis: ['low', 'high'], quadrants: ['', '', '', ''], items: [{ label: 'Item A', x: 0.3, y: 0.7 }, { label: 'Item B', x: 0.8, y: 0.4 }] }),
+  kanban: () => ({ type: 'kanban', title: '<title>', columns: [{ title: 'Todo', cards: ['Task A|detail'] }, { title: 'Doing', cards: ['Task B'] }, { title: 'Done', cards: ['Task C'] }] }),
+  swimlane: () => ({ type: 'swimlane', title: '<title>', lanes: [{ id: 'user', label: 'User' }, { id: 'system', label: 'System' }], steps: [{ id: 's1', lane: 'user', t: 0, card: 'Submit' }, { id: 's2', lane: 'system', t: 1, card: 'Validate' }, { id: 's3', lane: 'system', t: 2, card: 'Respond' }], edges: [{ from: 's1', to: 's2' }, { from: 's2', to: 's3' }] }),
 };
 for (const t of ['dependency', 'call-graph', 'network', 'knowledge-graph', 'data-lineage'])
   SCAFFOLDS[t] = () => G(t, [{ id: 'a', card: 'Node A' }, { id: 'b', card: 'Node B' }, { id: 'c', card: 'Node C' }], [{ from: 'a', to: 'b' }, { from: 'a', to: 'c' }]);

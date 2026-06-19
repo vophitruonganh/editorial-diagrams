@@ -1,0 +1,25 @@
+{
+  "type": "swimlane",
+  "id": "swimlane-checkout",
+  "eyebrow": "Process · Swimlane",
+  "title": "Checkout flow",
+  "lanes": [
+    { "id": "user", "label": "User" },
+    { "id": "api", "label": "API" },
+    { "id": "payment", "label": "Payment" }
+  ],
+  "steps": [
+    { "id": "cart", "lane": "user", "t": 0, "card": "Review cart" },
+    { "id": "submit", "lane": "user", "t": 1, "card": "Submit order" },
+    { "id": "validate", "lane": "api", "t": 2, "card": "Validate order" },
+    { "id": "charge", "lane": "payment", "t": 3, "card": "Charge card" },
+    { "id": "confirm", "lane": "api", "t": 4, "card": "sec:Confirm" }
+  ],
+  "edges": [
+    { "from": "cart", "to": "submit" },
+    { "from": "submit", "to": "validate" },
+    { "from": "validate", "to": "charge", "label": "ok" },
+    { "from": "charge", "to": "confirm", "label": "paid" }
+  ],
+  "caption": "Identity Platform · checkout swimlane"
+}

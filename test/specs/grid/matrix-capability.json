@@ -1,0 +1,14 @@
+{
+  "type": "matrix",
+  "id": "matrix-capability",
+  "eyebrow": "Capability matrix",
+  "title": "Plan comparison",
+  "cols": ["Free", "Pro", "Enterprise"],
+  "rows": [
+    { "label": "SSO", "cells": ["—", "✓", "✓"] },
+    { "label": "MFA", "cells": ["✓", "✓", "✓"] },
+    { "label": "Audit log", "cells": ["—", "30d", "1y"] },
+    { "label": "SLA", "cells": ["—", "—", "99.9%"] }
+  ],
+  "caption": "Identity Platform · plan comparison"
+}

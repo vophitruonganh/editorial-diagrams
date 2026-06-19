@@ -1,0 +1,16 @@
+{
+  "type": "quadrant",
+  "id": "quadrant-effort",
+  "eyebrow": "Prioritization",
+  "title": "Effort vs Impact",
+  "xAxis": ["low effort", "high effort"],
+  "yAxis": ["low impact", "high impact"],
+  "quadrants": ["quick wins", "big bets", "fill-ins", "money pit"],
+  "items": [
+    { "label": "MFA", "x": 0.3, "y": 0.85 },
+    { "label": "SSO", "x": 0.75, "y": 0.8 },
+    { "label": "Dark mode", "x": 0.25, "y": 0.3 },
+    { "label": "Re-platform", "x": 0.85, "y": 0.35 }
+  ],
+  "caption": "Identity Platform · prioritization"
+}
