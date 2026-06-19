@@ -1,0 +1,28 @@
+{
+  "type": "flowchart",
+  "id": "flowchart-login",
+  "eyebrow": "Flowchart · runtime decision",
+  "title": "Login flow",
+  "subtitle": "box = <b>step</b> · arrow = <b>next</b>",
+  "direction": "TB",
+  "nodes": [
+    { "id": "a", "card": "Receive request|[HTTPS] /auth/login" },
+    { "id": "b", "card": "Authenticate|password / WebAuthn" },
+    { "id": "c", "card": "sec:MFA required?|decision" },
+    { "id": "d", "card": "Send OTP|→ api-challenge" },
+    { "id": "e", "card": "sec:Issue token|JWT · set session" },
+    { "id": "f", "card": "Reject|401 invalid" },
+    { "id": "g", "card": "Done|200 · Set-Cookie" }
+  ],
+  "edges": [
+    { "from": "a", "to": "b" },
+    { "from": "b", "to": "c", "label": "ok" },
+    { "from": "b", "to": "f", "label": "fail" },
+    { "from": "c", "to": "d", "label": "yes" },
+    { "from": "c", "to": "e", "label": "no" },
+    { "from": "d", "to": "e", "label": "verified" },
+    { "from": "e", "to": "g" },
+    { "from": "f", "to": "g" }
+  ],
+  "caption": "Identity Platform · Flowchart — login + MFA"
+}
