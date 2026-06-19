@@ -8,6 +8,11 @@
 
 **Tech Stack:** Node ≥18 ESM · puppeteer-core (render) · `@dagrejs/dagre` (graph layout) · `node:test`. No new heavy deps beyond dagre.
 
+## Build status — ALL PHASES COMPLETE (2026-06-20)
+Phases 0/A/B/C/D/E/F built inline, TDD, **70 tests pass**, **31 diagram types** live across 5 engines (flow · graph · lane · sequence · grid), PNG/PDF/SVG all verified. 6 MCP tools (render_diagram · validate_spec · describe_spec_schema · scaffold_spec · list_examples · get_example). Each notation-heavy type visually verified through the production path.
+- **Deferred (only items not built):** `communication` diagram (a sequence variant — do next, reuses the sequence engine), plus the below-threshold exclusions (Venn, Sankey).
+- Follow-ups: node auto-measuring for tighter graph layouts; `alt`/`opt`/`loop` frames for sequence; expand `@stores`/`@core` partials.
+
 ## Global Constraints
 - **Style by code:** nodes = editorial `card()` + `editorial.css`; all notation (arrowheads, crow's-foot, diamonds, fork/join, lifelines, lane curves) hand-drawn SVG matching editorial tokens (`--border #DCE0E6`, radius 10, slate `#475569`, amber `#b45309`, indigo). Never a third-party engine's visuals.
 - **Layout engines compute geometry only** (dagre = node x/y + edge waypoints; lane = column/time math). Visual is 100% ours.
