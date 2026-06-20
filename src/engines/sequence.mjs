@@ -13,7 +13,7 @@ export function renderSequence(spec, css) {
   const msgs = spec.messages || [];
   const X0 = 110, GAP = spec.gap || 200, AW = 150, AH = 48, TOP = 16;
   const headBottom = TOP + AH;
-  const ROW = 50, firstY = headBottom + 46;
+  const ROW = 60, firstY = headBottom + 54;
   const ai = Object.fromEntries(actors.map((a, i) => [a.id, i]));
   const x = id => X0 + ai[id] * GAP;
   const rowY = r => firstY + r * ROW;

@@ -24,6 +24,9 @@ export async function layoutGraph(nodes, edges, opts = {}) {
       'elk.direction': DIR[direction] || 'DOWN',
       'elk.layered.spacing.nodeNodeBetweenLayers': String(ranksep),
       'elk.spacing.nodeNode': String(nodesep),
+      'elk.spacing.edgeNode': '26',          // breathing room between edges and nodes
+      'elk.spacing.edgeEdge': '18',
+      'elk.layered.spacing.edgeNodeBetweenLayers': '26',
       'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
       'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
       'elk.edgeRouting': 'ORTHOGONAL',

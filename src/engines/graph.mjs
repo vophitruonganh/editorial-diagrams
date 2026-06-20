@@ -23,7 +23,8 @@ export async function renderGraph(spec, css, opts = {}) {
   const sizeOf = opts.sizeOf || nodeSizeOf;
   const laid = await layoutGraph(nodes, edges, {
     direction: spec.direction || 'TB',
-    nodesep: spec.nodesep, ranksep: spec.ranksep,
+    nodesep: spec.nodesep ?? 60,   // airier defaults (override per-spec if needed)
+    ranksep: spec.ranksep ?? 96,
     sizeOf,
   });
 
