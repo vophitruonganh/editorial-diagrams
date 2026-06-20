@@ -8,6 +8,7 @@ export const GRAPH_TYPES = [
   'flowchart', 'activity', 'state', 'erd', 'class', 'c4-l4',
   'dependency', 'call-graph', 'network', 'mindmap',
   'org-chart', 'decision-tree', 'knowledge-graph', 'data-lineage',
+  'communication',
 ];
 export const LANE_TYPES = ['git-workflow', 'timeline', 'gantt', 'user-journey'];
 export const SEQUENCE_TYPES = ['sequence'];

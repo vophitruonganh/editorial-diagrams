@@ -1,0 +1,25 @@
+{
+  "type": "communication",
+  "id": "communication-login",
+  "eyebrow": "UML · Communication diagram",
+  "title": "Login — object collaboration",
+  "subtitle": "objects + <b>numbered messages</b> (call order) on a free layout",
+  "direction": "LR",
+  "nodesep": 80,
+  "ranksep": 150,
+  "nodes": [
+    { "id": "user", "card": "End user" },
+    { "id": "ctrl", "card": "LoginController" },
+    { "id": "mfa", "card": "MFAOrchestrator" },
+    { "id": "cred", "card": "CredentialClient" },
+    { "id": "token", "card": "sec:TokenModule" }
+  ],
+  "edges": [
+    { "from": "user", "to": "ctrl", "label": "1: login(creds)" },
+    { "from": "ctrl", "to": "cred", "label": "2: verify(pwd)" },
+    { "from": "ctrl", "to": "mfa", "label": "3: require(user)" },
+    { "from": "mfa", "to": "ctrl", "label": "4: ok" },
+    { "from": "ctrl", "to": "token", "label": "5: issue(subject)" }
+  ],
+  "caption": "Identity Platform · Communication — login collaboration"
+}

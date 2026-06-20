@@ -28,6 +28,7 @@ const graphCheatsheet =
 
 // Returns the schema + cheat-sheet for a given diagram type (graph types → graph schema).
 export function describeForType(type) {
+  if (type === 'communication') return { schema: graphSchema, cheatsheet: 'Communication diagram (UML) — objects + numbered messages on a free layout:\n' + graphCheatsheet + '\n  Convention: number each edge label by call order, e.g. "1: login()", "2: verify()", "2.1: ...". Use direction:"LR" for a network feel.' };
   if (GRAPH_TYPES.includes(type)) return { schema: graphSchema, cheatsheet: graphCheatsheet };
   if (LANE_TYPES.includes(type)) return { schema: {}, cheatsheet: laneCheatsheets[type] || Object.values(laneCheatsheets).join('\n') };
   if (GRID_TYPES.includes(type)) return { schema: {}, cheatsheet: gridCheatsheets[type] || Object.values(gridCheatsheets).join('\n') };

@@ -4,7 +4,7 @@
   "type": "object",
   "required": ["type", "title", "nodes"],
   "properties": {
-    "type": { "enum": ["flowchart", "activity", "state", "erd", "class", "c4-l4", "dependency", "call-graph", "network", "mindmap", "org-chart", "decision-tree", "knowledge-graph", "data-lineage"] },
+    "type": { "enum": ["flowchart", "activity", "state", "erd", "class", "c4-l4", "dependency", "call-graph", "network", "mindmap", "org-chart", "decision-tree", "knowledge-graph", "data-lineage", "communication"] },
     "id": { "type": "string" },
     "eyebrow": { "type": "string" },
     "title": { "type": "string" },

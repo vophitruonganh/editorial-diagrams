@@ -28,6 +28,7 @@ const SCAFFOLDS = {
 };
 for (const t of ['dependency', 'call-graph', 'network', 'knowledge-graph', 'data-lineage'])
   SCAFFOLDS[t] = () => G(t, [{ id: 'a', card: 'Node A' }, { id: 'b', card: 'Node B' }, { id: 'c', card: 'Node C' }], [{ from: 'a', to: 'b' }, { from: 'a', to: 'c' }]);
+SCAFFOLDS.communication = () => ({ type: 'communication', title: '<title>', direction: 'LR', nodesep: 80, ranksep: 150, nodes: [{ id: 'u', card: 'User' }, { id: 'c', card: 'Controller' }, { id: 's', card: 'Service' }], edges: [{ from: 'u', to: 'c', label: '1: request()' }, { from: 'c', to: 's', label: '2: process()' }, { from: 's', to: 'c', label: '3: result' }] });
 for (const t of ['mindmap', 'org-chart', 'decision-tree'])
   SCAFFOLDS[t] = () => G(t, [{ id: 'root', card: 'Root' }, { id: 'a', card: 'Child A' }, { id: 'b', card: 'Child B' }], [{ from: 'root', to: 'a' }, { from: 'root', to: 'b' }]);
 

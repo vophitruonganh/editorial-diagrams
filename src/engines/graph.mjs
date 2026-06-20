@@ -38,8 +38,11 @@ export function renderGraph(spec, css, opts = {}) {
     if (e.endTo) glyphs += edgeEndGlyph(e.endTo, pts[pts.length - 1], unit(pts[pts.length - 1], pts[pts.length - 2]), stroke);
     if (e.label) labels += edgeLabelChip(pts[Math.floor(pts.length / 2)], e.label);
   }
-  const svg = `<svg width="${laid.width}" height="${laid.height}" style="position:absolute;left:0;top:0;pointer-events:none">${arrowMarkerDefs()}${paths}${glyphs}${labels}</svg>`;
+  const dim = `width="${laid.width}" height="${laid.height}" style="position:absolute;left:0;top:0;pointer-events:none"`;
+  const edgeSvg = `<svg ${dim}>${arrowMarkerDefs()}${paths}${glyphs}</svg>`;
   const nodeHTML = laid.nodes.map(n => renderNode(n, { w: n.w, h: n.h, left: n.left, top: n.top })).join('');
-  const body = `\n  <div style="position:relative;width:${laid.width}px;height:${laid.height}px;margin:12px auto 4px">${svg}${nodeHTML}</div>`;
+  // labels go on a top layer so they're never hidden behind node cards
+  const labelSvg = labels ? `<svg ${dim}>${labels}</svg>` : '';
+  const body = `\n  <div style="position:relative;width:${laid.width}px;height:${laid.height}px;margin:12px auto 4px">${edgeSvg}${nodeHTML}${labelSvg}</div>`;
   return renderChrome(spec, body, css, { maxw: laid.width + 80 });
 }
