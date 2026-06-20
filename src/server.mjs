@@ -18,14 +18,14 @@ export function buildServer(server) {
         'Writes the file to disk and (for PNG) returns the image inline. ' +
         'Pass `spec` inline or `spec_path` to a .json file. Call describe_spec_schema for the DSL.',
       inputSchema: {
-        spec: specSchema.optional(),
+        spec: z.union([specSchema, z.string()]).optional(),
         spec_path: z.string().optional(),
         format: z.enum(['png', 'pdf', 'svg']).optional(),
         scale: z.number().min(1).max(3).optional(),
         width: z.number().min(320).max(4000).optional(),
         out_path: z.string().optional(),
         transparent: z.boolean().optional(),
-        return_image: z.union([z.boolean(), z.enum(['auto', 'full', 'none'])]).optional(),
+        return_image: z.union([z.boolean(), z.enum(['auto', 'full', 'none', 'link'])]).optional(),
         preview_width: z.number().min(300).max(2000).optional(),
       },
     },
@@ -36,8 +36,8 @@ export function buildServer(server) {
     'validate_spec',
     {
       title: 'Validate diagram spec',
-      description: 'Cheap structural + DSL validation of a diagram spec. Use before render_diagram to avoid wasted renders.',
-      inputSchema: { spec: specSchema },
+      description: 'Cheap structural + DSL validation of a diagram spec (object, JSON string, or TOON string). Use before render_diagram to avoid wasted renders.',
+      inputSchema: { spec: z.union([specSchema, z.string()]) },
     },
     (args) => validateSpecTool(args),
   );

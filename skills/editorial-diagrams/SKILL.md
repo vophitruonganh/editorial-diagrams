@@ -46,7 +46,8 @@ Always use this compact string form, not the verbose object form.
 
 ## Token efficiency (large diagrams)
 - The on-disk file is always **full quality**; only the inline preview is downscaled — safe to tune.
-- `return_image: "auto"` (default) returns a downscaled preview; lower `preview_width` (e.g. 800) for big/tall diagrams to cut image tokens; `"none"` for batch.
+- `return_image`: `"auto"` (default — sharp-downscaled preview by `preview_width`, default 900) · `"full"` (full-res inline) · `"none"` (path only) · `"link"` (resource link — user sees it, 0 model image tokens).
+- Spec input may be a JSON **or TOON** string (TOON ~30–40% fewer tokens on the nodes/edges arrays), or `spec_path` to a `.json`/`.toon` file.
 - `defs`: define reusable strings once and reference as `$name` (whole value or inside the card DSL) — e.g. `"defs": { "go": "[Go · REST]" }` then `"card": "API|$go|REST"`. Cuts repeated tech tags / details.
 - Reuse: `scaffold_spec`/`get_example` → write to file → `validate_spec` → render by `spec_path`; edit deltas on iterations.
 

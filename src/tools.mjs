@@ -1,5 +1,8 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, basename } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { decode as toonDecode } from '@toon-format/toon';
+import { optimizePng, resizePng } from './imageutil.mjs';
 import { renderByType } from './router.mjs';
 import { loadThemeCss } from './themes/index.mjs';
 import { renderHtml } from './render.mjs';
@@ -16,7 +19,7 @@ const errorResult = (msg) => ({ isError: true, content: [text(msg)] });
 function returnMode(v) {
   if (v === false) return 'none';
   if (v === true || v === undefined) return 'auto';
-  return ['auto', 'full', 'none'].includes(v) ? v : 'auto';
+  return ['auto', 'full', 'none', 'link'].includes(v) ? v : 'auto';
 }
 
 // preview downscale factor: cap the WIDTH (text legibility scales with width, so a
@@ -28,10 +31,21 @@ export function previewScaleFor(w, h, capWidth = 900) {
 
 const DEFAULT_OUT_DIR = join(process.cwd(), 'diagrams-out');
 
+// Accepts a spec object, a JSON string, or a TOON string (token-efficient input).
+export function parseSpec(raw, isToon) {
+  if (raw == null || typeof raw === 'object') return raw;
+  if (typeof raw !== 'string') return raw;
+  if (isToon) return toonDecode(raw);
+  try { return JSON.parse(raw); } catch { return toonDecode(raw); }
+}
+
 function loadSpec(args) {
   if (args.spec && args.spec_path) throw new Error('pass `spec` or `spec_path`, not both');
-  if (args.spec) return args.spec;
-  if (args.spec_path) return JSON.parse(readFileSync(resolve(args.spec_path), 'utf8'));
+  if (args.spec) return parseSpec(args.spec);
+  if (args.spec_path) {
+    const p = resolve(args.spec_path);
+    return parseSpec(readFileSync(p, 'utf8'), p.endsWith('.toon'));
+  }
   throw new Error('one of `spec` or `spec_path` is required');
 }
 
@@ -63,22 +77,34 @@ export async function renderDiagram(args = {}) {
 
   const outPath = outPathFor(args, spec, rendered.ext);
   mkdirSync(dirname(outPath), { recursive: true });
-  writeFileSync(outPath, rendered.buffer);
+  // lossless-optimize PNG files (sharp: same pixels, smaller bytes); pdf/svg unchanged.
+  const fileBuf = format === 'png' ? await optimizePng(rendered.buffer) : rendered.buffer;
+  writeFileSync(outPath, fileBuf);
 
-  const meta = `Rendered ${format.toUpperCase()} ${rendered.width}×${rendered.height}px (${rendered.buffer.length} bytes) → ${outPath}`;
+  const meta = `Rendered ${format.toUpperCase()} ${rendered.width}×${rendered.height} (${fileBuf.length} bytes) → ${outPath}`;
   const content = [text(meta)];
   const mode = returnMode(args.return_image);
   try {
-    if (mode === 'full' && format === 'png') {
-      content.push({ type: 'image', data: rendered.buffer.toString('base64'), mimeType: 'image/png' });
+    if (mode === 'link') {
+      // resource link: client can show the file to the user; no pixels enter model context
+      content.push({ type: 'resource_link', uri: pathToFileURL(outPath).href, name: basename(outPath), mimeType: rendered.mimeType });
     } else if (mode === 'full') {
-      const png = await renderHtml(html, { format: 'png', scale, width, transparent, css });
-      content.push({ type: 'image', data: png.buffer.toString('base64'), mimeType: 'image/png' });
+      const png = format === 'png' ? fileBuf : (await renderHtml(html, { format: 'png', scale, width, transparent, css })).buffer;
+      content.push({ type: 'image', data: png.toString('base64'), mimeType: 'image/png' });
     } else if (mode === 'auto') {
-      const pscale = previewScaleFor(rendered.width, rendered.height, args.preview_width || 900);
-      const preview = await renderHtml(html, { format: 'png', scale: pscale, width, transparent, css });
-      content[0] = text(`${meta} · inline preview ${preview.pxWidth}×${preview.pxHeight}px (${pscale.toFixed(2)}× — file on disk is full-res)`);
-      content.push({ type: 'image', data: preview.buffer.toString('base64'), mimeType: 'image/png' });
+      const cap = args.preview_width || 900;
+      let prev = null;
+      if (format === 'png') {
+        const r = await resizePng(fileBuf, Math.min(cap, rendered.pxWidth || rendered.width)); // sharp Lanczos, 1 render total
+        if (r) prev = r;
+      }
+      if (!prev) {                                                    // fallback: 2nd browser render
+        const ps = previewScaleFor(rendered.width, rendered.height, cap);
+        const r = await renderHtml(html, { format: 'png', scale: ps, width, transparent, css });
+        prev = { buffer: r.buffer, width: r.pxWidth, height: r.pxHeight };
+      }
+      content[0] = text(`${meta} · inline preview ${prev.width}×${prev.height}px (file on disk is full-res)`);
+      content.push({ type: 'image', data: prev.buffer.toString('base64'), mimeType: 'image/png' });
     }
     // 'none' → path/metadata only
   } catch (e) {
@@ -88,7 +114,10 @@ export async function renderDiagram(args = {}) {
 }
 
 export function validateSpecTool(args = {}) {
-  const r = validateSpec(args.spec);
+  let spec;
+  try { spec = parseSpec(args.spec); }
+  catch (e) { return { content: [text(JSON.stringify({ valid: false, errors: ['could not parse spec: ' + e.message] }, null, 2))] }; }
+  const r = validateSpec(spec);
   return { content: [text(JSON.stringify(r, null, 2))] };
 }
 

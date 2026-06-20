@@ -17,7 +17,9 @@
     "@dagrejs/dagre": "^3.0.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "@puppeteer/browsers": "^2.4.0",
+    "@toon-format/toon": "^2.3.0",
     "puppeteer-core": "^23.0.0",
+    "sharp": "^0.35.2",
     "zod": "^3.23.0"
   }
 }
