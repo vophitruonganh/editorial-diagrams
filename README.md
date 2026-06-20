@@ -9,32 +9,41 @@ The plugin self-bootstraps: on first run it installs its own dependencies
 (no need to commit `node_modules`; native `sharp`/`puppeteer-core` binaries are
 fetched for your OS). Requires `node` + `npm` on PATH.
 
-**From this repo (local path):**
+**From GitHub (recommended)** — in Claude Code run:
 ```
-/plugin marketplace add /Users/arvo/SilverTiger/editorial-diagrams-mcp
+/plugin marketplace add vophitruonganh/editorial-diagrams
 /plugin install editorial-diagrams
 ```
 
-**From git (after you push it to a remote):**
+**From a local clone (development):**
 ```
-/plugin marketplace add <github-user>/<repo>
+/plugin marketplace add /absolute/path/to/editorial-diagrams
 /plugin install editorial-diagrams
 ```
 
 First launch shows "installing dependencies (one time)…" on stderr, then the
 `editorial-diagrams` MCP server + the `editorial-diagrams` skill become available.
+To pick up a new version after the repo changes: `/plugin marketplace update editorial-diagrams`.
 
 **Manual MCP registration (no plugin system):** add to your MCP config:
 ```json
 { "mcpServers": { "editorial-diagrams": { "command": "node", "args": ["/abs/path/src/launch.mjs"] } } }
 ```
 
-**Optional (future):** publish to npm and switch `.mcp.json` to `npx -y editorial-diagrams-mcp` for zero-clone installs.
+### Publish / update on GitHub
+```
+git remote -v                       # origin → github.com:vophitruonganh/editorial-diagrams.git
+git push -u origin main             # first push (or your default branch)
+```
+`node_modules` is gitignored on purpose — the launcher installs deps (incl. native
+`sharp`/`puppeteer-core`/`elkjs`) on first run, so the repo stays small and cross-OS.
+
+**Optional:** publish to npm and point the plugin's `mcpServers.args` to `npx -y editorial-diagrams-mcp` for zero-clone installs.
 
 ## Diagram types
 - **Flow / C4** (built-in engine): c4-l1..l3, dynamic, deployment, landscape, layered, dfd, pipeline.
-- **Graph** (dagre + editorial cards): flowchart, activity, state, erd, class, dependency,
-  call-graph, network, mindmap, org-chart, decision-tree, knowledge-graph, data-lineage.
+- **Graph** (ELK balanced layout + editorial cards): flowchart, activity, state, erd, class,
+  dependency, call-graph, network, mindmap, org-chart, decision-tree, knowledge-graph, data-lineage, communication.
 - **Lane / time**: git-workflow, timeline, gantt, user-journey.
 
 All in the editorial style — nodes are editorial cards, notation (arrowheads, crow's-foot,
