@@ -14,28 +14,28 @@ const css = loadThemeCss();
 const out = join(tmpdir(), 'edm-tokens.png');
 after(() => { closeBrowser(); if (existsSync(out)) rmSync(out); });
 
-test('expandDefs replaces $name in values and inside card DSL', () => {
+test('expandDefs replaces $name in values and inside card DSL', async () => {
   const s = expandDefs({ type: 'flowchart', title: 'T', defs: { go: '[Go · REST]' }, nodes: [{ id: 'a', card: 'API|$go|x' }], edges: [] });
   assert.ok(!('defs' in s));
   assert.match(s.nodes[0].card, /\[Go · REST\]/);
 });
 
-test('expandDefs leaves unknown $refs untouched and is a no-op without defs', () => {
+test('expandDefs leaves unknown $refs untouched and is a no-op without defs', async () => {
   assert.equal(expandDefs({ title: 'T', defs: {}, x: '$unknown' }).x, '$unknown');
   const noDefs = { title: 'T', x: '$5 literal' };
   assert.equal(expandDefs(noDefs).x, '$5 literal');
 });
 
-test('previewScaleFor caps the WIDTH (keeps text legible; file stays full-res)', () => {
+test('previewScaleFor caps the WIDTH (keeps text legible; file stays full-res)', async () => {
   assert.equal(previewScaleFor(600, 800, 900), 1);     // narrower than cap → no downscale (readable)
   assert.equal(previewScaleFor(1800, 500, 900), 0.5);  // wide → half by width
   assert.equal(previewScaleFor(5000, 500, 900), 0.3);  // clamp floor
 });
 
-test('defs spec validates AND renders expanded', () => {
+test('defs spec validates AND renders expanded', async () => {
   const spec = { type: 'flowchart', title: 'T', defs: { t: '[tech]' }, nodes: [{ id: 'a', card: 'A|$t' }, { id: 'b', card: 'B' }], edges: [{ from: 'a', to: 'b' }] };
   assert.equal(validateSpec(spec).valid, true);
-  assert.match(renderByType(spec, css), /\[tech\]/);
+  assert.match(await renderByType(spec, css), /\[tech\]/);
 });
 
 test('render_diagram auto returns a preview while writing a full-res file', async () => {

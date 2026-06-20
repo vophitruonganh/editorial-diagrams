@@ -12,8 +12,8 @@ const spec = JSON.parse(readFileSync(new URL('./specs/sequence/login-mfa.json', 
 
 after(() => closeBrowser());
 
-test('sequence renders actors, lifelines, messages, activation bars', () => {
-  const h = renderByType(spec, css);
+test('sequence renders actors, lifelines, messages, activation bars', async () => {
+  const h = await renderByType(spec, css);
   assert.match(h, /<h4 style="margin:0">api-auth<\/h4>/); // actor header
   assert.match(h, /stroke-dasharray="3 4"/);              // lifeline
   assert.match(h, />POST \/login</);                       // message text
@@ -21,7 +21,7 @@ test('sequence renders actors, lifelines, messages, activation bars', () => {
   assert.match(h, /url\(#seqf\)/);                         // sync arrowhead
 });
 
-test('sequence validation flags unknown actor', () => {
+test('sequence validation flags unknown actor', async () => {
   const bad = validateSpec({ type: 'sequence', title: 'x', actors: [{ id: 'a' }], messages: [{ from: 'a', to: 'z', text: 'hi' }] });
   assert.equal(bad.valid, false);
   assert.ok(bad.errors.some(e => /not a declared actor/.test(e)));
@@ -29,7 +29,7 @@ test('sequence validation flags unknown actor', () => {
 });
 
 test('sequence renders to a valid PNG', async () => {
-  const { buffer } = await renderHtml(renderByType(spec, css), { format: 'png', scale: 1 });
+  const { buffer } = await renderHtml(await renderByType(spec, css), { format: 'png', scale: 1 });
   assert.deepEqual([...buffer.subarray(0, 4)], [0x89, 0x50, 0x4e, 0x47]);
   assert.ok(buffer.length > 1000);
 });

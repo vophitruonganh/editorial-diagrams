@@ -13,20 +13,20 @@ const spec = JSON.parse(readFileSync(new URL('./specs/graph/communication-login.
 
 after(() => closeBrowser());
 
-test('communication: objects + numbered message labels + arrows', () => {
-  const h = renderByType(spec, css);
+test('communication: objects + numbered message labels + arrows', async () => {
+  const h = await renderByType(spec, css);
   assert.match(h, />LoginController</);
   assert.match(h, />1: login\(creds\)</);
   assert.match(h, /url\(#arrow\)/);
 });
 
-test('communication scaffold validates + renders', () => {
+test('communication scaffold validates + renders', async () => {
   const s = scaffoldSpec('communication');
   assert.equal(validateSpec(s).valid, true, validateSpec(s).errors.join('; '));
-  assert.match(renderByType(s, css), /class="diagram"/);
+  assert.match(await renderByType(s, css), /class="diagram"/);
 });
 
 test('communication renders to a valid PNG', async () => {
-  const { buffer } = await renderHtml(renderByType(spec, css), { format: 'png', scale: 1 });
+  const { buffer } = await renderHtml(await renderByType(spec, css), { format: 'png', scale: 1 });
   assert.deepEqual([...buffer.subarray(0, 4)], [0x89, 0x50, 0x4e, 0x47]);
 });

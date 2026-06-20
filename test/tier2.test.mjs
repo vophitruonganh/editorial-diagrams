@@ -15,17 +15,17 @@ const css = loadThemeCss();
 const out = join(tmpdir(), 'edm-tier2.png');
 after(() => { closeBrowser(); if (existsSync(out)) rmSync(out); });
 
-test('every scaffold type is valid AND renders without error', () => {
+test('every scaffold type is valid AND renders without error', async () => {
   for (const type of scaffoldTypes()) {
     const spec = scaffoldSpec(type);
     const v = validateSpec(spec);
     assert.equal(v.valid, true, `${type} scaffold invalid: ${v.errors.join('; ')}`);
-    const html = renderByType(spec, css);
+    const html = await renderByType(spec, css);
     assert.match(html, /class="diagram"/, `${type} render`);
   }
 });
 
-test('examples: list includes known ids, get returns the spec', () => {
+test('examples: list includes known ids, get returns the spec', async () => {
   const ids = listExamples().map(e => e.id);
   assert.ok(ids.includes('flowchart-login'));
   assert.ok(ids.includes('git-gitflow'));

@@ -17,10 +17,10 @@ for (const t of SEQUENCE_TYPES) ENGINES[t] = renderSequence;
 // Later phases register their engines here (lane, sequence).
 export function registerEngine(type, fn) { ENGINES[type] = fn; }
 
-export function renderByType(rawSpec, css) {
+export async function renderByType(rawSpec, css) {
   let spec = expandDefs(rawSpec);
   const fn = spec && spec.type && ENGINES[spec.type];
-  if (fn) return fn(spec, css);
+  if (fn) return await fn(spec, css); // graph engine is async (ELK); lane/grid/sequence resolve immediately
   // flow engine: let `type` alone drive a preset (c4-l1..l3, dynamic) when `preset` is unset
   if (spec && !spec.preset && PRESET_TYPES.includes(spec.type)) spec = { ...spec, preset: spec.type };
   return renderSpec(spec, css);

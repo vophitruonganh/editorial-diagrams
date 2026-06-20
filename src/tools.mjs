@@ -69,7 +69,7 @@ export async function renderDiagram(args = {}) {
   const scale = args.scale ?? 2, width = args.width ?? 1320, transparent = !!args.transparent;
   let rendered, html;
   try {
-    html = renderByType(spec, css);
+    html = await renderByType(spec, css);
     rendered = await renderHtml(html, { format, scale, width, transparent, css });
   } catch (e) {
     return errorResult(`render failed: ${e.message}`);

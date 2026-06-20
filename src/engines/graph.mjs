@@ -1,5 +1,5 @@
 // Graph engine: spec {nodes,edges} → editorial HTML.
-// Nodes laid out by dagre, drawn as editorial nodes; edges drawn as editorial SVG.
+// Nodes laid out by ELK (balanced), drawn as editorial nodes; edges as editorial SVG.
 // Covers flowchart now; activity/state/erd/class/trees/graphs add node+edge KINDS
 // (registered in nodes.mjs / edges.mjs) without changing this engine.
 import { renderChrome } from '../chrome.mjs';
@@ -17,11 +17,11 @@ export function nodeSizeOf(n) {
 
 const unit = (a, b) => { const v = { x: a.x - b.x, y: a.y - b.y }; const m = Math.hypot(v.x, v.y) || 1; return { x: v.x / m, y: v.y / m }; };
 
-export function renderGraph(spec, css, opts = {}) {
+export async function renderGraph(spec, css, opts = {}) {
   const nodes = spec.nodes || [];
   const edges = spec.edges || [];
   const sizeOf = opts.sizeOf || nodeSizeOf;
-  const laid = layoutGraph(nodes, edges, {
+  const laid = await layoutGraph(nodes, edges, {
     direction: spec.direction || 'TB',
     nodesep: spec.nodesep, ranksep: spec.ranksep,
     sizeOf,

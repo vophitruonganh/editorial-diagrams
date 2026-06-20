@@ -14,24 +14,24 @@ const cls = load('class-domain.json');
 
 after(() => closeBrowser());
 
-test('activity: decision diamond + fork/join + start/end + guard labels', () => {
-  const h = renderByType(activity, css);
+test('activity: decision diamond + fork/join + start/end + guard labels', async () => {
+  const h = await renderByType(activity, css);
   assert.match(h, />Valid\?</);            // decision label
   assert.match(h, /background:#475569/);    // start/fork/join slate glyph
   assert.match(h, />yes</);                 // guard label chip
   assert.match(h, /class="card sec"/);      // sec action card
 });
 
-test('erd: entity table with PK/FK + crow\'s-foot lines, no arrowhead on relations', () => {
-  const h = renderByType(erd, css);
+test('erd: entity table with PK/FK + crow\'s-foot lines, no arrowhead on relations', async () => {
+  const h = await renderByType(erd, css);
   assert.match(h, />PK</);
   assert.match(h, />FK</);
   assert.match(h, />ORG</);
   assert.match(h, /<line /);                // crow's-foot strokes
 });
 
-test('class: compartments + UML triangle/diamond ends', () => {
-  const h = renderByType(cls, css);
+test('class: compartments + UML triangle/diamond ends', async () => {
+  const h = await renderByType(cls, css);
   assert.match(h, />authenticate\(\)</);
   assert.match(h, /<polygon /);             // triangle / diamond glyph
   assert.match(h, />extends</);
@@ -39,7 +39,7 @@ test('class: compartments + UML triangle/diamond ends', () => {
 
 test('activity/erd/class render to valid PNGs', async () => {
   for (const spec of [activity, erd, cls]) {
-    const { buffer } = await renderHtml(renderByType(spec, css), { format: 'png', scale: 1 });
+    const { buffer } = await renderHtml(await renderByType(spec, css), { format: 'png', scale: 1 });
     assert.deepEqual([...buffer.subarray(0, 4)], [0x89, 0x50, 0x4e, 0x47], `${spec.type} PNG`);
     assert.ok(buffer.length > 1000);
   }

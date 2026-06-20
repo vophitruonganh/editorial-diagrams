@@ -16,13 +16,13 @@ const spec = { type: 'flowchart', title: 'T', nodes: [{ id: 'a', card: 'A' }, { 
 const out = join(tmpdir(), 'edm-h.png');
 after(() => { closeBrowser(); if (existsSync(out)) rmSync(out); });
 
-test('TOON: parseSpec decodes a TOON string round-trip + renders', () => {
+test('TOON: parseSpec decodes a TOON string round-trip + renders', async () => {
   const toon = encode(spec);
   assert.deepEqual(parseSpec(toon), spec);            // lossless
-  assert.match(renderByType(parseSpec(toon), css), /class="card"/);
+  assert.match(await renderByType(parseSpec(toon), css), /class="card"/);
 });
 
-test('TOON / JSON string both accepted; validate_spec parses strings', () => {
+test('TOON / JSON string both accepted; validate_spec parses strings', async () => {
   assert.equal(parseSpec(JSON.stringify(spec)).type, 'flowchart');
   const r = validateSpecTool({ spec: encode(spec) });
   assert.match(r.content[0].text, /"valid": ?true/);
@@ -36,7 +36,7 @@ test('return_image:link returns a resource_link (no inline image)', async () => 
 });
 
 test('sharp optimizePng + resizePng (graceful if sharp missing)', async () => {
-  const r = await renderHtml(renderByType(spec, css), { format: 'png', scale: 2, css });
+  const r = await renderHtml(await renderByType(spec, css), { format: 'png', scale: 2, css });
   const opt = await optimizePng(r.buffer);
   assert.deepEqual([...opt.subarray(0, 4)], [0x89, 0x50, 0x4e, 0x47]);
   const small = await resizePng(r.buffer, 300);

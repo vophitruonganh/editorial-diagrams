@@ -12,7 +12,7 @@ const spec = JSON.parse(readFileSync(new URL('./specs/graph/flowchart-login.json
 after(() => closeBrowser());
 
 test('flowchart golden renders to a valid non-empty PNG', async () => {
-  const html = renderByType(spec, css);
+  const html = await renderByType(spec, css);
   const { buffer, width, height } = await renderHtml(html, { format: 'png', scale: 1 });
   assert.deepEqual([...buffer.subarray(0, 4)], [0x89, 0x50, 0x4e, 0x47]);
   assert.ok(buffer.length > 1000, 'PNG not empty');

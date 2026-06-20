@@ -19,8 +19,8 @@ const spec = {
   ],
 };
 
-test('renderGraph emits cards, edges, arrowhead, labels, chrome', () => {
-  const html = renderGraph(spec, css);
+test('renderGraph emits cards, edges, arrowhead, labels, chrome', async () => {
+  const html = await renderGraph(spec, css);
   assert.equal((html.match(/class="card/g) || []).length, 4);
   assert.match(html, /<svg/);
   assert.match(html, /<path /);
@@ -29,6 +29,6 @@ test('renderGraph emits cards, edges, arrowhead, labels, chrome', () => {
   assert.match(html, />ok</); // edge label chip
 });
 
-test('renderGraph is deterministic', () => {
-  assert.equal(renderGraph(spec, css), renderGraph(spec, css));
+test('renderGraph is deterministic', async () => {
+  assert.equal(await renderGraph(spec, css), await renderGraph(spec, css));
 });

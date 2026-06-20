@@ -16,33 +16,33 @@ const journey = load('journey-signup.json');
 
 after(() => closeBrowser());
 
-test('git-workflow: lanes, commits, branch/merge curves', () => {
-  const h = renderByType(git, css);
+test('git-workflow: lanes, commits, branch/merge curves', async () => {
+  const h = await renderByType(git, css);
   assert.match(h, />main</);
   assert.match(h, /<circle /);   // commits
   assert.match(h, /<path /);     // branch/merge curves
   assert.match(h, />merge feature</);
 });
 
-test('timeline: events laid out with cards', () => {
-  const h = renderByType(tl, css);
+test('timeline: events laid out with cards', async () => {
+  const h = await renderByType(tl, css);
   assert.match(h, />MVP</);
   assert.match(h, /<foreignObject/);
 });
 
-test('gantt: task names + bars', () => {
-  const h = renderByType(gantt, css);
+test('gantt: task names + bars', async () => {
+  const h = await renderByType(gantt, css);
   assert.match(h, />Build API</);
   assert.match(h, /<rect /);
 });
 
-test('user-journey: stages + sentiment polyline', () => {
-  const h = renderByType(journey, css);
+test('user-journey: stages + sentiment polyline', async () => {
+  const h = await renderByType(journey, css);
   assert.match(h, />Onboard</);
   assert.match(h, /<polyline /);
 });
 
-test('lane validation catches bad specs', () => {
+test('lane validation catches bad specs', async () => {
   assert.equal(validateSpec({ type: 'gantt', title: 'x', tasks: [{ name: 'a', start: 5, end: 2 }] }).valid, false);
   assert.equal(validateSpec({ type: 'timeline', title: 'x', events: [] }).valid, false);
   const badGit = validateSpec({ type: 'git-workflow', title: 'x', lanes: [{ id: 'main' }], commits: [{ branch: 'nope', t: 0 }] });
@@ -52,7 +52,7 @@ test('lane validation catches bad specs', () => {
 
 test('all four lane types render to valid PNGs', async () => {
   for (const spec of [git, tl, gantt, journey]) {
-    const { buffer } = await renderHtml(renderByType(spec, css), { format: 'png', scale: 1 });
+    const { buffer } = await renderHtml(await renderByType(spec, css), { format: 'png', scale: 1 });
     assert.deepEqual([...buffer.subarray(0, 4)], [0x89, 0x50, 0x4e, 0x47], `${spec.type} PNG`);
     assert.ok(buffer.length > 1000);
   }

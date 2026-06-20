@@ -8,18 +8,18 @@ import { validateSpec } from '../src/validate.mjs';
 const css = loadThemeCss();
 const flow = JSON.parse(readFileSync(new URL('./specs/40-arch-api.json', import.meta.url)));
 
-test('renderByType routes flowchart to the graph engine', () => {
-  const html = renderByType({ type: 'flowchart', title: 'F', nodes: [{ id: 'a', card: 'A' }, { id: 'b', card: 'B' }], edges: [{ from: 'a', to: 'b' }] }, css);
+test('renderByType routes flowchart to the graph engine', async () => {
+  const html = await renderByType({ type: 'flowchart', title: 'F', nodes: [{ id: 'a', card: 'A' }, { id: 'b', card: 'B' }], edges: [{ from: 'a', to: 'b' }] }, css);
   assert.match(html, /url\(#arrow\)/);
   assert.match(html, /class="card"/);
 });
 
-test('renderByType still routes preset/C4 specs to the flow engine', () => {
-  const html = renderByType(flow, css);
+test('renderByType still routes preset/C4 specs to the flow engine', async () => {
+  const html = await renderByType(flow, css);
   assert.match(html, /class="boundary"/); // flow-only block
 });
 
-test('validateSpec validates graph specs by nodes/edges', () => {
+test('validateSpec validates graph specs by nodes/edges', async () => {
   assert.equal(validateSpec({ type: 'flowchart', title: 'F', nodes: [{ id: 'a' }] }).valid, true);
   const bad = validateSpec({ type: 'flowchart', title: 'F', nodes: [{ id: 'a' }], edges: [{ from: 'a', to: 'z' }] });
   assert.equal(bad.valid, false);

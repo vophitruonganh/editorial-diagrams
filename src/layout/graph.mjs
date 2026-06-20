@@ -1,29 +1,52 @@
-// Graph layout via dagre — computes node positions + edge waypoints ONLY.
-// Visual is drawn by the engine (editorial cards + SVG), never by dagre.
-// Generic: `sizeOf(node)` lets later phases pass measured sizes (entity tables,
-// class boxes); multigraph supports parallel edges.
-import dagre from '@dagrejs/dagre';
+// Graph layout via ELK (layered + Brandes-Köpf BALANCED placement) — produces
+// centered, symmetric, professional layouts. Computes node positions + orthogonal
+// edge waypoints ONLY; visual is drawn by the engine (editorial cards + SVG).
+// Async (ELK's API is promise-based). `sizeOf(node)` lets callers pass measured sizes.
+import ELK from 'elkjs/lib/elk.bundled.js';
 
-export function layoutGraph(nodes, edges, opts = {}) {
-  const { direction = 'TB', nodesep = 46, ranksep = 60, marginx = 24, marginy = 16, sizeOf } = opts;
-  const g = new dagre.graphlib.Graph({ multigraph: true });
-  g.setGraph({ rankdir: direction, nodesep, ranksep, marginx, marginy });
-  g.setDefaultEdgeLabel(() => ({}));
+const elk = new ELK();
+const DIR = { TB: 'DOWN', BT: 'UP', LR: 'RIGHT', RL: 'LEFT' };
+
+export async function layoutGraph(nodes, edges, opts = {}) {
+  const { direction = 'TB', nodesep = 46, ranksep = 60, sizeOf } = opts;
 
   const size = {};
-  for (const n of nodes) {
+  const children = nodes.map(n => {
     const s = (sizeOf && sizeOf(n)) || { w: n.w || 200, h: n.h || 84 };
     size[n.id] = s;
-    g.setNode(n.id, { width: s.w, height: s.h });
-  }
-  edges.forEach((e, i) => g.setEdge(e.from, e.to, {}, `e${i}`));
-  dagre.layout(g);
+    return { id: n.id, width: s.w, height: s.h };
+  });
+
+  const graph = {
+    id: 'root',
+    layoutOptions: {
+      'elk.algorithm': 'layered',
+      'elk.direction': DIR[direction] || 'DOWN',
+      'elk.layered.spacing.nodeNodeBetweenLayers': String(ranksep),
+      'elk.spacing.nodeNode': String(nodesep),
+      'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
+      'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
+      'elk.edgeRouting': 'ORTHOGONAL',
+      'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
+    },
+    children,
+    edges: edges.map((e, i) => ({ id: 'e' + i, sources: [e.from], targets: [e.to] })),
+  };
+
+  const res = await elk.layout(graph);
+  const pos = Object.fromEntries((res.children || []).map(c => [c.id, c]));
+  const em = Object.fromEntries((res.edges || []).map(e => [e.id, e]));
 
   const outNodes = nodes.map(n => {
-    const gn = g.node(n.id), s = size[n.id];
-    return { ...n, x: gn.x, y: gn.y, w: s.w, h: s.h, left: gn.x - s.w / 2, top: gn.y - s.h / 2 };
+    const c = pos[n.id] || { x: 0, y: 0 }, s = size[n.id];
+    return { ...n, x: c.x + s.w / 2, y: c.y + s.h / 2, w: s.w, h: s.h, left: c.x, top: c.y };
   });
-  const outEdges = edges.map((e, i) => ({ ...e, points: g.edge(e.from, e.to, `e${i}`).points }));
-  const gr = g.graph();
-  return { nodes: outNodes, edges: outEdges, width: Math.ceil(gr.width), height: Math.ceil(gr.height) };
+  const outEdges = edges.map((e, i) => {
+    const ge = em['e' + i], sec = ge && ge.sections && ge.sections[0];
+    const points = sec
+      ? [sec.startPoint, ...(sec.bendPoints || []), sec.endPoint]
+      : [{ x: pos[e.from].x + size[e.from].w / 2, y: pos[e.from].y + size[e.from].h / 2 }, { x: pos[e.to].x + size[e.to].w / 2, y: pos[e.to].y + size[e.to].h / 2 }];
+    return { ...e, points };
+  });
+  return { nodes: outNodes, edges: outEdges, width: Math.ceil(res.width), height: Math.ceil(res.height) };
 }

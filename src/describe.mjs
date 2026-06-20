@@ -24,7 +24,7 @@ const graphCheatsheet =
   'Graph spec (flowchart, …): { type, title, direction?, nodes:[{id, card}], edges:[{from,to,label?,style?,arrow?}] }\n' +
   '  node.card uses the card DSL: "[kind:][+]Name | [tech] | detail" (kind ∈ person|ext|ds|jewel|sec|muted)\n' +
   '  edge.style ∈ orthogonal(default)|rounded|straight · edge.arrow:false to drop the arrowhead\n' +
-  '  direction ∈ TB(default)|LR|BT|RL · layout is automatic (dagre)';
+  '  direction ∈ TB(default)|LR|BT|RL · layout is automatic + balanced (ELK)';
 
 // Returns the schema + cheat-sheet for a given diagram type (graph types → graph schema).
 export function describeForType(type) {
