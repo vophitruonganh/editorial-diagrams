@@ -1,66 +1,79 @@
-# editorial-diagrams-mcp
+# Editorial Diagrams
 
-MCP server that renders editorial-style architecture diagrams (PNG/PDF/SVG) from
-a compact JSON spec. Reuses the spec-driven generator + `editorial.css`.
+A Claude Code plugin that turns plain requests into **clean, consistent, editorial‑style
+diagrams** — architecture (C4), UML, ERD, flowcharts, sequence, git workflows, gantt and
+more — rendered to **PNG / PDF / SVG**. You describe what you want in chat; Claude writes a
+compact spec and the plugin renders a polished image, all in one house style.
 
-## Install as a Claude Code plugin
+> 30+ diagram types · 5 layout engines · one consistent look · balanced auto‑layout.
 
-The plugin self-bootstraps: on first run it installs its own dependencies
-(no need to commit `node_modules`; native `sharp`/`puppeteer-core` binaries are
-fetched for your OS). Requires `node` + `npm` on PATH.
+## Install
 
-**From GitHub (recommended)** — in Claude Code run:
+In Claude Code, run:
+
 ```
 /plugin marketplace add vophitruonganh/editorial-diagrams
 /plugin install editorial-diagrams
 ```
 
-**From a local clone (development):**
-```
-/plugin marketplace add /absolute/path/to/editorial-diagrams
-/plugin install editorial-diagrams
-```
+That's it. On first use you'll briefly see *"installing dependencies (one time)…"* — the
+plugin sets itself up automatically. To update later: `/plugin marketplace update editorial-diagrams`.
 
-First launch shows "installing dependencies (one time)…" on stderr, then the
-`editorial-diagrams` MCP server + the `editorial-diagrams` skill become available.
-To pick up a new version after the repo changes: `/plugin marketplace update editorial-diagrams`.
+**Requirements:** Node.js + npm available on your machine, and a Chrome/Edge browser
+(the plugin downloads a renderer automatically if none is found).
 
-**Manual MCP registration (no plugin system):** add to your MCP config:
-```json
-{ "mcpServers": { "editorial-diagrams": { "command": "node", "args": ["/abs/path/src/launch.mjs"] } } }
-```
+## How to use
 
-### Publish / update on GitHub
-```
-git remote -v                       # origin → github.com:vophitruonganh/editorial-diagrams.git
-git push -u origin main             # first push (or your default branch)
-```
-`node_modules` is gitignored on purpose — the launcher installs deps (incl. native
-`sharp`/`puppeteer-core`/`elkjs`) on first run, so the repo stays small and cross-OS.
+Just ask Claude in natural language — the `editorial-diagrams` skill activates automatically:
 
-**Optional:** publish to npm and point the plugin's `mcpServers.args` to `npx -y editorial-diagrams-mcp` for zero-clone installs.
+- *"Draw a C4 container diagram of this system."*
+- *"Make an ERD of the users / orders / sessions tables."*
+- *"Sequence diagram for the login + MFA flow."*
+- *"Flowchart of the checkout process with the retry and error paths."*
+- *"GitFlow branching diagram for our release process."*
 
-## Diagram types
-- **Flow / C4** (built-in engine): c4-l1..l3, dynamic, deployment, landscape, layered, dfd, pipeline.
-- **Graph** (ELK balanced layout + editorial cards): flowchart, activity, state, erd, class,
-  dependency, call-graph, network, mindmap, org-chart, decision-tree, knowledge-graph, data-lineage, communication.
-- **Lane / time**: git-workflow, timeline, gantt, user-journey.
+Claude writes the spec, renders it, saves the image to disk, and shows you a preview — then
+you can ask for tweaks (*"make the payment branch red", "split this into two diagrams"*) and
+it re‑renders.
 
-All in the editorial style — nodes are editorial cards, notation (arrowheads, crow's-foot,
-UML triangle/diamond, fork/join, lifelines) is hand-drawn SVG matching the palette.
+## Features
 
-## Tools
-- `render_diagram` — spec → file on disk (+ inline preview). `spec` or `spec_path`;
-  `format` (png/pdf/svg) · `scale` · `width` · `out_path` · `transparent` ·
-  `return_image` (`auto` preview / `full` / `none`).
-- `validate_spec` — cheap structural + DSL check (use before rendering).
-- `describe_spec_schema` — schema + DSL cheat-sheet (pass `type` for graph/lane specs).
-- `scaffold_spec` — write a per-type starter skeleton to disk (edit deltas → saves tokens).
-- `list_examples` / `get_example` — bundled golden specs to copy from.
+- **One consistent editorial style** for every diagram — same cards, palette, and typography.
+- **30+ diagram types** across 5 engines (below).
+- **PNG · PDF · SVG** output; transparent background and resolution options.
+- **Balanced, professional auto‑layout** (ELK) — centered, symmetric, no overlapping edges.
+- **Token‑efficient** — compact spec instead of hand‑written HTML, downscaled inline previews,
+  reusable scaffolds and examples; full‑resolution files always saved to disk.
+- **You don't learn a DSL** — Claude authors the spec for you.
 
-## Chromium
-Prefers a system Chrome/Edge; otherwise downloads Chromium on first run to
-`~/.cache/editorial-diagrams-mcp/`. Override with `PUPPETEER_EXECUTABLE_PATH`.
+## Supported diagrams
 
-## Test
-`node --test` (render tests need a resolvable Chrome).
+| Family | Types |
+|---|---|
+| **C4 / architecture** | System Context (L1) · Container (L2) · Component (L3) · Code (L4) · Dynamic · Deployment · System Landscape · Layered · Data‑flow (DFD) · Pipeline |
+| **UML & graphs** | Flowchart · Activity · State machine · Class · Sequence · Communication · ERD · Dependency / call graph · Network · Mind map · Org chart · Decision tree · Knowledge graph · Data lineage |
+| **Workflow & time** | Git workflow (trunk / GitFlow) · Timeline / roadmap · Gantt · User journey |
+| **Grid & board** | Matrix · Quadrant (2×2) · Kanban · Swimlane |
+
+## Gallery
+
+Real output from the plugin:
+
+| | |
+|---|---|
+| **C4 — Container view**<br><img src="docs/samples/c4-container.png" width="420"> | **ERD — crow's‑foot**<br><img src="docs/samples/erd.png" width="420"> |
+| **UML Activity**<br><img src="docs/samples/activity.png" width="420"> | **UML Sequence**<br><img src="docs/samples/sequence.png" width="420"> |
+| **Git workflow (GitFlow)**<br><img src="docs/samples/git-workflow.png" width="420"> | **Kanban board**<br><img src="docs/samples/kanban.png" width="420"> |
+
+## Output formats & options
+
+- `format`: `png` (default) · `pdf` (true vector) · `svg`
+- `return_image`: `auto` (full‑res file on disk + a downscaled inline preview) · `full` · `none` · `link`
+- `preview_width`, `scale`, `width`, `transparent` — all optional.
+
+The on‑disk file is always full quality; only the inline preview is downsized (for token efficiency).
+
+## Privacy & trust
+
+The plugin runs locally and renders with a local browser — your diagram content never leaves
+your machine. As with any plugin, review the source before installing.
