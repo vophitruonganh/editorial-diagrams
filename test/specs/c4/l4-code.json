@@ -1,0 +1,19 @@
+{
+  "type": "c4-l4",
+  "id": "c4-l4-code",
+  "eyebrow": "Code view (C4 L4) · api-auth",
+  "title": "Login controller — code",
+  "subtitle": "△ inheritance · ◆ composition · classes inside the Login component",
+  "nodes": [
+    { "id": "ctrl", "kind": "class", "name": "LoginController", "attributes": ["mfa: MFAOrchestrator", "creds: CredentialClient"], "methods": ["login(req)", "callback()"] },
+    { "id": "mfa", "kind": "class", "name": "MFAOrchestrator", "methods": ["require(user)", "verify(otp)"] },
+    { "id": "cred", "kind": "class", "name": "CredentialClient", "methods": ["verify(pwd)"] },
+    { "id": "token", "kind": "class", "name": "TokenModule", "methods": ["issue(subject)"] }
+  ],
+  "edges": [
+    { "from": "ctrl", "to": "mfa", "endFrom": "diamond-filled", "arrow": false, "label": "uses" },
+    { "from": "ctrl", "to": "cred", "endFrom": "diamond-filled", "arrow": false, "label": "uses" },
+    { "from": "ctrl", "to": "token", "label": "issues via" }
+  ],
+  "caption": "Identity Platform · Code (C4 L4) — login controller"
+}

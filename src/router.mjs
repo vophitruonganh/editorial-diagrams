@@ -5,7 +5,7 @@ import { renderGraph } from './engines/graph.mjs';
 import { renderLane } from './engines/lane.mjs';
 import { renderGrid } from './engines/grid.mjs';
 import { renderSequence } from './engines/sequence.mjs';
-import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES, SEQUENCE_TYPES } from './types.mjs';
+import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES, SEQUENCE_TYPES, PRESET_TYPES } from './types.mjs';
 
 const ENGINES = {};
 for (const t of GRAPH_TYPES) ENGINES[t] = renderGraph;
@@ -18,5 +18,8 @@ export function registerEngine(type, fn) { ENGINES[type] = fn; }
 
 export function renderByType(spec, css) {
   const fn = spec && spec.type && ENGINES[spec.type];
-  return fn ? fn(spec, css) : renderSpec(spec, css);
+  if (fn) return fn(spec, css);
+  // flow engine: let `type` alone drive a preset (c4-l1..l3, dynamic) when `preset` is unset
+  if (spec && !spec.preset && PRESET_TYPES.includes(spec.type)) spec = { ...spec, preset: spec.type };
+  return renderSpec(spec, css);
 }

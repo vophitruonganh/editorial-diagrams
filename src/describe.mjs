@@ -52,7 +52,7 @@ const cardDSL =
   '  [tech] or ‹marker› segment → technology tag; remaining segments → detail line\n' +
   'Examples: "+Account Service | users · credentials" · "ds:MongoDB | [datastore] | identity"';
 
-const presets = ['c4-l3', 'c4-l2', 'dynamic'];
+const presets = ['c4-l1', 'c4-l2', 'c4-l3', 'dynamic'];
 
 const partials =
   '@stores → MongoDB/KeyDB/Kafka datastore row · @core → shared Core boundary (idp-specific helpers)';

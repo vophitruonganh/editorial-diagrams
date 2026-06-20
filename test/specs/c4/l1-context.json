@@ -1,0 +1,21 @@
+{
+  "preset": "c4-l1",
+  "type": "c4-l1",
+  "id": "c4-l1-context",
+  "eyebrow": "System Context (C4 L1) · Identity Platform",
+  "title": "Identity Platform — system context",
+  "persons": ["person:End user|‹person›|signs in · manages identity", "person:Admin|‹person›|configures org & policy"],
+  "personsCols": 2,
+  "conn": "[HTTPS]",
+  "system": "‹software system› Identity Platform|auth · MFA · SSO · org & policy",
+  "systemConn": "[REST/Thrift] · [SMTP] · [OAuth]",
+  "externals": ["ext:Email / SMS|‹external system›|delivers OTP & mail", "ext:Google / SAML IdP|‹external system›|federated login", "ext:KMS|‹external system›|key management"],
+  "externalsCols": 3,
+  "rels": [
+    "End user → Identity Platform (signs in, MFA)",
+    "Admin → Identity Platform (configures org, policy)",
+    "Identity Platform → Email / SMS (OTP, notifications)",
+    "Identity Platform ↔ Google / SAML IdP (federated login)"
+  ],
+  "caption": "Identity Platform · System Context (C4 L1)"
+}

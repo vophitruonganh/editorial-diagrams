@@ -148,6 +148,24 @@ export function applyPreset(spec) {
       blocks.push(b);
     }
   }
+  if (spec.preset === 'c4-l1') {
+    if (spec.subtitle === undefined) spec.subtitle = 'box = <b>person / software system</b> · arrow = <b>uses</b> · System Context (C4 L1)';
+    if (spec.persons) {
+      const b = { cards: spec.persons, conn: spec.conn };
+      const lbl = spec.personsLabel !== undefined ? spec.personsLabel : 'People · actors';
+      if (lbl) { b.label = lbl; b.ctx = true; }
+      if (spec.personsCols) b.cols = spec.personsCols;
+      blocks.push(b);
+    }
+    if (spec.system) blocks.push({ cards: [spec.system], center: true, maxw: spec.systemMaxw || 540, conn: spec.systemConn });
+    if (spec.externals) {
+      const b = { cards: spec.externals };
+      const lbl = spec.externalsLabel !== undefined ? spec.externalsLabel : 'External systems (context)';
+      if (lbl) { b.label = lbl; b.ctx = true; }
+      if (spec.externalsCols) b.cols = spec.externalsCols;
+      blocks.push(b);
+    }
+  }
   if (spec.preset === 'dynamic') {
     if (spec.subtitle === undefined) spec.subtitle = 'numbered steps = <b>execution order</b> · each step = <b>component → component</b> + protocol';
     if (spec.steps) blocks.push({ steps: spec.steps });

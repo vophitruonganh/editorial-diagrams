@@ -25,7 +25,7 @@ function validateGrid(spec) {
   return errors;
 }
 
-const PRESETS = ['c4-l3', 'c4-l2', 'dynamic'];
+const PRESETS = ['c4-l1', 'c4-l2', 'c4-l3', 'dynamic'];
 
 const LANE_REQUIRED = {
   'git-workflow': ['lanes', 'commits'],
@@ -117,6 +117,9 @@ export function validateSpec(spec) {
   }
   if ((spec.preset === 'c4-l3' || spec.preset === 'c4-l2') && !spec.boundary && !spec.blocks) {
     errors.push('`c4-l3`/`c4-l2` preset expects a `boundary` (or pre-expanded `blocks`)');
+  }
+  if (spec.preset === 'c4-l1' && !spec.system && !spec.blocks) {
+    errors.push('`c4-l1` preset expects a `system` (or pre-expanded `blocks`)');
   }
   if (spec.blocks !== undefined && !Array.isArray(spec.blocks)) {
     errors.push('`blocks` must be an array when present');
