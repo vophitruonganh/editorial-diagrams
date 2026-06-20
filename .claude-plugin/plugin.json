@@ -1,6 +1,6 @@
 {
   "name": "editorial-diagrams",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Render editorial-style architecture diagrams (PNG/PDF/SVG) from a compact JSON spec via MCP.",
   "author": { "name": "arvo" },
   "mcpServers": {
