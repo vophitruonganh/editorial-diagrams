@@ -85,13 +85,13 @@ export function buildServer(server) {
   return server;
 }
 
-async function main() {
+export async function start() {
   const server = new McpServer({ name: 'editorial-diagrams', version: '0.1.0' });
   buildServer(server);
   await server.connect(new StdioServerTransport());
 }
 
-// Run only when invoked directly (not when imported by tests).
+// Run only when invoked directly (not when imported by tests/launcher).
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((e) => { console.error(e); process.exit(1); });
+  start().catch((e) => { console.error(e); process.exit(1); });
 }
