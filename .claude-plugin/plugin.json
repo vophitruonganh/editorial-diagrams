@@ -3,10 +3,60 @@
   "version": "0.2.0",
   "description": "Render editorial-style architecture diagrams (PNG/PDF/SVG) from a compact JSON spec via MCP.",
   "author": { "name": "arvo" },
+  "userConfig": {
+    "transparent": {
+      "type": "boolean",
+      "title": "Transparent PNG background",
+      "description": "Render PNGs with a see-through background instead of white. Best when embedding on a coloured or dark surface.",
+      "default": false
+    },
+    "format": {
+      "type": "string",
+      "title": "Default output format",
+      "description": "Format used when a render doesn't specify one: png, pdf, or svg.",
+      "default": "png"
+    },
+    "scale": {
+      "type": "number",
+      "title": "Raster scale (1–3)",
+      "description": "Resolution multiplier for the saved PNG file. 2 = retina. Higher = sharper but larger.",
+      "default": 2,
+      "min": 1,
+      "max": 3
+    },
+    "preview_width": {
+      "type": "number",
+      "title": "Inline preview width (px)",
+      "description": "Max width of the preview Claude sees inline. The file on disk stays full resolution.",
+      "default": 900,
+      "min": 300,
+      "max": 2000
+    },
+    "return_image": {
+      "type": "string",
+      "title": "Inline image mode",
+      "description": "How the rendered image comes back: auto (downscaled preview), full (full-res inline), none (path only), or link.",
+      "default": "auto"
+    },
+    "out_dir": {
+      "type": "directory",
+      "title": "Output folder",
+      "description": "Where rendered diagram files are written.",
+      "default": "diagrams-out"
+    }
+  },
   "mcpServers": {
     "editorial-diagrams": {
       "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/src/launch.mjs"]
+      "args": ["${CLAUDE_PLUGIN_ROOT}/src/launch.mjs"],
+      "env": {
+        "CLAUDE_PLUGIN_OPTION_TRANSPARENT": "${user_config.transparent}",
+        "CLAUDE_PLUGIN_OPTION_FORMAT": "${user_config.format}",
+        "CLAUDE_PLUGIN_OPTION_SCALE": "${user_config.scale}",
+        "CLAUDE_PLUGIN_OPTION_PREVIEW_WIDTH": "${user_config.preview_width}",
+        "CLAUDE_PLUGIN_OPTION_RETURN_IMAGE": "${user_config.return_image}",
+        "CLAUDE_PLUGIN_OPTION_OUT_DIR": "${user_config.out_dir}"
+      }
     }
   }
 }

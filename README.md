@@ -72,6 +72,40 @@ Real output from the plugin:
 
 The on‑disk file is always full quality; only the inline preview is downsized (for token efficiency).
 
+## Configuration (optional)
+
+Set your own defaults so you don't repeat options each time.
+
+**From the plugin manager (recommended).** Open `/plugin`, pick **editorial‑diagrams →
+Configure**, and set any of:
+
+| Option | What it does |
+|---|---|
+| Transparent PNG background | See‑through PNGs instead of white |
+| Default output format | `png` · `pdf` · `svg` |
+| Raster scale (1–3) | Resolution of the saved file (2 = retina) |
+| Inline preview width (px) | Width of the preview Claude sees (file stays full‑res) |
+| Inline image mode | `auto` · `full` · `none` · `link` |
+| Output folder | Where rendered files are written |
+
+**From a file (alternative for project‑scoped defaults).** Create
+`editorial-diagrams.config.json` in your project (or `~/.config/editorial-diagrams/config.json`):
+
+```json
+{
+  "format": "png",
+  "transparent": true,
+  "scale": 2,
+  "preview_width": 900,
+  "return_image": "auto",
+  "out_dir": "./diagrams"
+}
+```
+
+The plugin‑manager settings take effect when set; the config file is used otherwise. Anything you
+pass in a specific request overrides both. `"transparent": true` makes PNGs with a see‑through
+background — best on light backgrounds, since diagram text is dark.
+
 ## Privacy & trust
 
 The plugin runs locally and renders with a local browser — your diagram content never leaves

@@ -3,6 +3,7 @@ import { dirname, join, resolve, basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { decode as toonDecode } from '@toon-format/toon';
 import { optimizePng, resizePng } from './imageutil.mjs';
+import { loadConfig } from './config.mjs';
 import { renderByType } from './router.mjs';
 import { loadThemeCss } from './themes/index.mjs';
 import { renderHtml } from './render.mjs';
@@ -49,10 +50,11 @@ function loadSpec(args) {
   throw new Error('one of `spec` or `spec_path` is required');
 }
 
-function outPathFor(args, spec, ext) {
+function outPathFor(args, cfg, spec, ext) {
   if (args.out_path) return resolve(args.out_path);
   const id = (spec && spec.id) || 'diagram';
-  return join(DEFAULT_OUT_DIR, `${id}.${ext}`);
+  const dir = cfg.out_dir ? resolve(cfg.out_dir) : DEFAULT_OUT_DIR;
+  return join(dir, `${id}.${ext}`);
 }
 
 export async function renderDiagram(args = {}) {
@@ -62,11 +64,15 @@ export async function renderDiagram(args = {}) {
   const v = validateSpec(spec);
   if (!v.valid) return errorResult(`Invalid spec — not rendered:\n• ${v.errors.join('\n• ')}`);
 
-  const format = args.format || 'png';
+  // defaults: per-call arg > config file > built-in
+  const cfg = loadConfig();
+  const format = args.format ?? cfg.format ?? 'png';
   if (!['png', 'pdf', 'svg'].includes(format)) return errorResult(`unknown format "${format}" (png|pdf|svg)`);
 
   const css = loadThemeCss('editorial');
-  const scale = args.scale ?? 2, width = args.width ?? 1320, transparent = !!args.transparent;
+  const scale = args.scale ?? cfg.scale ?? 2;
+  const width = args.width ?? cfg.width ?? 1320;
+  const transparent = args.transparent ?? cfg.transparent ?? false;
   let rendered, html;
   try {
     html = await renderByType(spec, css);
@@ -75,7 +81,7 @@ export async function renderDiagram(args = {}) {
     return errorResult(`render failed: ${e.message}`);
   }
 
-  const outPath = outPathFor(args, spec, rendered.ext);
+  const outPath = outPathFor(args, cfg, spec, rendered.ext);
   mkdirSync(dirname(outPath), { recursive: true });
   // lossless-optimize PNG files (sharp: same pixels, smaller bytes); pdf/svg unchanged.
   const fileBuf = format === 'png' ? await optimizePng(rendered.buffer) : rendered.buffer;
@@ -83,7 +89,7 @@ export async function renderDiagram(args = {}) {
 
   const meta = `Rendered ${format.toUpperCase()} ${rendered.width}×${rendered.height} (${fileBuf.length} bytes) → ${outPath}`;
   const content = [text(meta)];
-  const mode = returnMode(args.return_image);
+  const mode = returnMode(args.return_image ?? cfg.return_image);
   try {
     if (mode === 'link') {
       // resource link: client can show the file to the user; no pixels enter model context
@@ -92,7 +98,7 @@ export async function renderDiagram(args = {}) {
       const png = format === 'png' ? fileBuf : (await renderHtml(html, { format: 'png', scale, width, transparent, css })).buffer;
       content.push({ type: 'image', data: png.toString('base64'), mimeType: 'image/png' });
     } else if (mode === 'auto') {
-      const cap = args.preview_width || 900;
+      const cap = args.preview_width ?? cfg.preview_width ?? 900;
       let prev = null;
       if (format === 'png') {
         const r = await resizePng(fileBuf, Math.min(cap, rendered.pxWidth || rendered.width)); // sharp Lanczos, 1 render total

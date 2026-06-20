@@ -45,6 +45,9 @@ network, git-workflow, timeline, gantt, user-journey. (Not data charts — bar/l
 Always use this compact string form, not the verbose object form.
 
 ## Token efficiency (large diagrams)
+- User defaults (format/transparent/scale/preview_width/return_image/out_dir) may be set in the
+  plugin manager (`/plugin` → Configure) or in `editorial-diagrams.config.json`; per-call args
+  override them — don't restate options unless the user asks.
 - The on-disk file is always **full quality**; only the inline preview is downscaled — safe to tune.
 - `return_image`: `"auto"` (default — sharp-downscaled preview by `preview_width`, default 900) · `"full"` (full-res inline) · `"none"` (path only) · `"link"` (resource link — user sees it, 0 model image tokens).
 - Spec input may be a JSON **or TOON** string (TOON ~30–40% fewer tokens on the nodes/edges arrays), or `spec_path` to a `.json`/`.toon` file.

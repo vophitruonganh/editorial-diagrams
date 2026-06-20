@@ -52,6 +52,9 @@ export async function renderHtml(html, opts = {}) {
     const dsf = Math.max(0.25, Math.min(3, scale));
     await page.setViewport({ width, height: 1200, deviceScaleFactor: dsf });
     await page.setContent(html, { waitUntil: 'load' });
+    // for transparent PNGs the .diagram has a white bg in editorial.css — clear it so
+    // omitBackground actually shows through (cards/boundaries keep their own backgrounds)
+    if (transparent) await page.addStyleTag({ content: 'html,body{background:transparent!important}.diagram{background:transparent!important}' });
     const el = await page.$('.diagram');
     const box = await el.boundingBox();
     const buffer = Buffer.from(await el.screenshot({ type: 'png', omitBackground: transparent }));
