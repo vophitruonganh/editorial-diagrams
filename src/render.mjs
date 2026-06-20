@@ -55,8 +55,16 @@ export async function renderHtml(html, opts = {}) {
     // for transparent PNGs the .diagram has a white bg in editorial.css — clear it so
     // omitBackground actually shows through (cards/boundaries keep their own backgrounds)
     if (transparent) await page.addStyleTag({ content: 'html,body{background:transparent!important}.diagram{background:transparent!important}' });
-    const el = await page.$('.diagram');
-    const box = await el.boundingBox();
+    let el = await page.$('.diagram');
+    let box = await el.boundingBox();
+    // The .diagram can be wider/taller than the viewport (wide graphs, tall lane diagrams).
+    // An element screenshot clips to the viewport, so grow the viewport to fit the element
+    // first, then re-measure — otherwise the right/bottom edge is cut off.
+    if (Math.ceil(box.width) > width || Math.ceil(box.height) > 1200) {
+      await page.setViewport({ width: Math.max(width, Math.ceil(box.width) + 4), height: Math.max(1200, Math.ceil(box.height) + 4), deviceScaleFactor: dsf });
+      el = await page.$('.diagram');
+      box = await el.boundingBox();
+    }
     const buffer = Buffer.from(await el.screenshot({ type: 'png', omitBackground: transparent }));
     return { buffer, mimeType: 'image/png', ext: 'png', width: Math.ceil(box.width), height: Math.ceil(box.height), pxWidth: Math.ceil(box.width * dsf), pxHeight: Math.ceil(box.height * dsf) };
   });

@@ -1,6 +1,6 @@
 {
   "name": "editorial-diagrams-mcp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "MCP server that renders editorial-style architecture diagrams from a compact JSON spec.",
   "type": "module",
   "bin": {

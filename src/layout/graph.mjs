@@ -32,9 +32,19 @@ export async function layoutGraph(nodes, edges, opts = {}) {
       'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
       'elk.edgeRouting': 'ORTHOGONAL',
       'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
+      // reserve space for edge labels so chips never sit on top of nodes
+      'elk.edgeLabels.placement': 'CENTER',
+      'elk.spacing.edgeLabel': '8',
     },
     children,
-    edges: edges.map((e, i) => ({ id: 'e' + i, sources: [e.from], targets: [e.to] })),
+    // declare label dimensions so ELK routes around them (matches edgeLabelChip sizing)
+    edges: edges.map((e, i) => {
+      const ed = { id: 'e' + i, sources: [e.from], targets: [e.to] };
+      if (e.label != null && e.label !== '') {
+        ed.labels = [{ id: 'el' + i, width: String(e.label).length * 6.5 + 14, height: 20, text: String(e.label) }];
+      }
+      return ed;
+    }),
   };
 
   const res = await elk.layout(graph);
@@ -50,7 +60,11 @@ export async function layoutGraph(nodes, edges, opts = {}) {
     const points = sec
       ? [sec.startPoint, ...(sec.bendPoints || []), sec.endPoint]
       : [{ x: pos[e.from].x + size[e.from].w / 2, y: pos[e.from].y + size[e.from].h / 2 }, { x: pos[e.to].x + size[e.to].w / 2, y: pos[e.to].y + size[e.to].h / 2 }];
-    return { ...e, points };
+    // ELK-placed label box centre (top-left + half dims); engine uses it so the chip
+    // sits in the reserved gap, never over a node. Falls back to the mid waypoint.
+    const lab = ge && ge.labels && ge.labels[0];
+    const labelPos = lab ? { x: lab.x + (lab.width || 0) / 2, y: lab.y + (lab.height || 0) / 2 } : null;
+    return { ...e, points, labelPos };
   });
   return { nodes: outNodes, edges: outEdges, width: Math.ceil(res.width), height: Math.ceil(res.height) };
 }

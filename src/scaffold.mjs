@@ -16,7 +16,42 @@ const SCAFFOLDS = {
   'c4-l2': () => ({ preset: 'c4-l2', type: 'c4-l2', eyebrow: 'Container view (C4 L2) · <system>', title: 'Inside <system> — containers', boundary: '‹software system› <system>', layers: [{ l: 'Containers', c: 3, cards: ['+Web app|[SPA]|UI', '+API|[Go]|REST', 'ds:Database|[datastore]|state'], conn: 'reads / writes' }], downstream: '@stores', caption: '' }),
   'c4-l3': () => ({ preset: 'c4-l3', type: 'c4-l3', eyebrow: 'Component view (C4 L3) · <service>', title: 'Inside <service>', boundary: '‹container› <service> — [tech]', layers: [{ l: 'Layer', c: 2, cards: ['+Component A|[tech]|detail', '+Component B|detail'], conn: 'uses' }], downstream: '@stores', caption: '' }),
   'c4-l4': () => ({ type: 'c4-l4', eyebrow: 'Code view (C4 L4) · <component>', title: 'Inside <component> — code', nodes: [{ id: 'Svc', kind: 'class', name: 'Service', attributes: ['repo: Repository'], methods: ['handle()'] }, { id: 'Repo', kind: 'class', name: 'Repository', methods: ['find()', 'save()'] }], edges: [{ from: 'Svc', to: 'Repo', endFrom: 'diamond-filled', arrow: false, label: 'uses' }] }),
-  'git-workflow': () => ({ type: 'git-workflow', title: '<title>', lanes: [{ id: 'main', label: 'main' }, { id: 'feature', label: 'feature' }], commits: [{ branch: 'main', t: 0, label: 'init' }, { branch: 'feature', t: 2 }, { branch: 'main', t: 4, label: 'merge' }], links: [{ type: 'branch', from: { branch: 'main', t: 0 }, to: { branch: 'feature', t: 2 } }, { type: 'merge', from: { branch: 'feature', t: 2 }, to: { branch: 'main', t: 4 } }] }),
+  // Standard gitflow. Lanes top→bottom; lifelines run along TIME (t = column).
+  // feature off develop→develop · release off develop→main+develop · hotfix off main→main+develop.
+  // Short labels (≤3 chars) sit inside the commit dot; longer ones (tags) float above.
+  'git-workflow': () => ({
+    type: 'git-workflow', title: '<title>', step: 132,
+    legend: [
+      { marker: 'dot', text: 'commit / tag phiên bản' },
+      { marker: 'solid', text: 'nhánh (vòng đời theo thời gian)' },
+      { marker: 'arrow', text: 'tách nhánh (branch) & merge (gộp)' },
+    ],
+    lanes: [
+      { id: 'main', label: 'main', color: '#2563EB' },
+      { id: 'hotfix', label: 'hotfix/*', color: '#b45309' },
+      { id: 'release', label: 'release/*', color: '#2E8B6B' },
+      { id: 'develop', label: 'develop', color: '#475569' },
+      { id: 'feature', label: 'feature/*', color: '#4F46E5' },
+    ],
+    commits: [
+      { branch: 'main', t: 0, label: 'v1.0.0' }, { branch: 'main', t: 6, label: 'v1.1.0' }, { branch: 'main', t: 9, label: 'v1.1.1' },
+      { branch: 'develop', t: 0.5 }, { branch: 'develop', t: 3 }, { branch: 'develop', t: 6 }, { branch: 'develop', t: 9 },
+      { branch: 'feature', t: 1, label: 'f1' }, { branch: 'feature', t: 2, label: 'f2' },
+      { branch: 'release', t: 4, label: 'rc' }, { branch: 'release', t: 5 },
+      { branch: 'hotfix', t: 7, label: 'hf' }, { branch: 'hotfix', t: 8 },
+    ],
+    links: [
+      { type: 'branch', from: { branch: 'main', t: 0 }, to: { branch: 'develop', t: 0.5 }, label: 'tạo develop' },
+      { type: 'branch', from: { branch: 'develop', t: 0.5 }, to: { branch: 'feature', t: 1 }, label: 'feature/*' },
+      { type: 'merge', from: { branch: 'feature', t: 2 }, to: { branch: 'develop', t: 3 }, label: 'merge feature' },
+      { type: 'branch', from: { branch: 'develop', t: 3 }, to: { branch: 'release', t: 4 }, label: 'release/*' },
+      { type: 'merge', from: { branch: 'release', t: 5 }, to: { branch: 'main', t: 6 }, label: 'merge → v1.1.0' },
+      { type: 'merge', from: { branch: 'release', t: 5 }, to: { branch: 'develop', t: 6 }, label: 'back-merge' },
+      { type: 'branch', from: { branch: 'main', t: 6 }, to: { branch: 'hotfix', t: 7 }, label: 'hotfix/*' },
+      { type: 'merge', from: { branch: 'hotfix', t: 8 }, to: { branch: 'main', t: 9 }, label: 'merge → v1.1.1' },
+      { type: 'merge', from: { branch: 'hotfix', t: 8 }, to: { branch: 'develop', t: 9 }, label: 'back-merge' },
+    ],
+  }),
   timeline: () => ({ type: 'timeline', title: '<title>', events: [{ at: 'Q1', title: 'Milestone A', detail: '...' }, { at: 'Q2', title: 'Milestone B' }] }),
   gantt: () => ({ type: 'gantt', title: '<title>', tasks: [{ name: 'Task A', start: 0, end: 3 }, { name: 'Task B', start: 3, end: 6 }] }),
   'user-journey': () => ({ type: 'user-journey', title: '<title>', stages: [{ name: 'Stage 1', sentiment: 3 }, { name: 'Stage 2', sentiment: 4 }] }),

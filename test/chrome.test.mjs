@@ -16,7 +16,9 @@ test('chrome wraps body with editorial header + inlined css', () => {
   assert.match(html, /class="caption">C</);
 });
 
-test('chrome maxw option sets max-width on the diagram', () => {
+test('chrome maxw option sets an explicit width on the diagram', () => {
+  // width (not max-width) so engine content wider than the stylesheet's 1200px
+  // grows the canvas instead of overflowing and getting clipped at screenshot time.
   const html = renderChrome({ title: 'T' }, '', css, { maxw: 900 });
-  assert.match(html, /class="diagram" style="max-width:900px"/);
+  assert.match(html, /class="diagram" style="width:900px;max-width:none"/);
 });

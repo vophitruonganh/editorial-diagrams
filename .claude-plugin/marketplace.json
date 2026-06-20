@@ -3,14 +3,14 @@
   "owner": { "name": "arvo" },
   "metadata": {
     "description": "Editorial-style diagram rendering for Claude — architecture/C4, UML, ERD, flow, lane & grid diagrams as PNG/PDF/SVG from a compact spec.",
-    "version": "0.2.0"
+    "version": "0.2.1"
   },
   "plugins": [
     {
       "name": "editorial-diagrams",
       "source": "./",
       "description": "Render 33 diagram types (C4 L1–L4, flowchart, activity, state, ERD, class, sequence, git-workflow, gantt, timeline, matrix, kanban, swimlane…) in one consistent editorial style, via MCP.",
-      "version": "0.2.0"
+      "version": "0.2.1"
     }
   ]
 }
