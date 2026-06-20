@@ -61,7 +61,6 @@ Real output from the plugin:
 
 | | |
 |---|---|
-| **C4 — Container view**<br><img src="docs/samples/c4-container.png" width="420"> | **ERD — crow's‑foot**<br><img src="docs/samples/erd.png" width="420"> |
 | **UML Activity**<br><img src="docs/samples/activity.png" width="420"> | **UML Sequence**<br><img src="docs/samples/sequence.png" width="420"> |
 | **Git workflow (GitFlow)**<br><img src="docs/samples/git-workflow.png" width="420"> | **Kanban board**<br><img src="docs/samples/kanban.png" width="420"> |
 
