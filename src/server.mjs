@@ -26,6 +26,7 @@ export function buildServer(server) {
         out_path: z.string().optional(),
         transparent: z.boolean().optional(),
         return_image: z.union([z.boolean(), z.enum(['auto', 'full', 'none'])]).optional(),
+        preview_width: z.number().min(300).max(2000).optional(),
       },
     },
     (args) => renderDiagram(args),

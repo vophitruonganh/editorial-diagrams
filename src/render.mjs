@@ -45,13 +45,16 @@ export async function renderHtml(html, opts = {}) {
     });
   }
 
-  // png (default)
+  // png (default). scale < 1 is allowed for downscaled previews (file renders pass scale ≥ 1).
+  // width/height = CSS (layout) px; pxWidth/pxHeight = actual raster px (= CSS × deviceScaleFactor),
+  // which is what image-token cost scales with.
   return withPage(html, async (page) => {
-    await page.setViewport({ width, height: 1200, deviceScaleFactor: Math.max(1, Math.min(3, scale)) });
+    const dsf = Math.max(0.25, Math.min(3, scale));
+    await page.setViewport({ width, height: 1200, deviceScaleFactor: dsf });
     await page.setContent(html, { waitUntil: 'load' });
     const el = await page.$('.diagram');
     const box = await el.boundingBox();
     const buffer = Buffer.from(await el.screenshot({ type: 'png', omitBackground: transparent }));
-    return { buffer, mimeType: 'image/png', ext: 'png', width: Math.ceil(box.width), height: Math.ceil(box.height) };
+    return { buffer, mimeType: 'image/png', ext: 'png', width: Math.ceil(box.width), height: Math.ceil(box.height), pxWidth: Math.ceil(box.width * dsf), pxHeight: Math.ceil(box.height * dsf) };
   });
 }

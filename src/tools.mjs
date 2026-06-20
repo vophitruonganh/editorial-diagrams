@@ -19,6 +19,13 @@ function returnMode(v) {
   return ['auto', 'full', 'none'].includes(v) ? v : 'auto';
 }
 
+// preview downscale factor: cap the WIDTH (text legibility scales with width, so a
+// tall diagram stays readable for verification) while cutting image tokens. The
+// on-disk file is always full-res; only the inline preview is downscaled.
+export function previewScaleFor(w, h, capWidth = 900) {
+  return Math.max(0.3, Math.min(1, capWidth / w));
+}
+
 const DEFAULT_OUT_DIR = join(process.cwd(), 'diagrams-out');
 
 function loadSpec(args) {
@@ -68,8 +75,9 @@ export async function renderDiagram(args = {}) {
       const png = await renderHtml(html, { format: 'png', scale, width, transparent, css });
       content.push({ type: 'image', data: png.buffer.toString('base64'), mimeType: 'image/png' });
     } else if (mode === 'auto') {
-      const preview = await renderHtml(html, { format: 'png', scale: 1, width, transparent, css });
-      content[0] = text(`${meta} · inline = downscaled preview (${preview.width}×${preview.height}, ${preview.buffer.length} bytes)`);
+      const pscale = previewScaleFor(rendered.width, rendered.height, args.preview_width || 900);
+      const preview = await renderHtml(html, { format: 'png', scale: pscale, width, transparent, css });
+      content[0] = text(`${meta} · inline preview ${preview.pxWidth}×${preview.pxHeight}px (${pscale.toFixed(2)}× — file on disk is full-res)`);
       content.push({ type: 'image', data: preview.buffer.toString('base64'), mimeType: 'image/png' });
     }
     // 'none' → path/metadata only

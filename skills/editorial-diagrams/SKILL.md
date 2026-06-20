@@ -44,6 +44,12 @@ network, git-workflow, timeline, gantt, user-journey. (Not data charts — bar/l
 `"[kind:][+]Name | [tech] | detail"` — kind ∈ person|ext|ds|jewel|sec|muted · `+` = ‹component› stereotype.
 Always use this compact string form, not the verbose object form.
 
+## Token efficiency (large diagrams)
+- The on-disk file is always **full quality**; only the inline preview is downscaled — safe to tune.
+- `return_image: "auto"` (default) returns a downscaled preview; lower `preview_width` (e.g. 800) for big/tall diagrams to cut image tokens; `"none"` for batch.
+- `defs`: define reusable strings once and reference as `$name` (whole value or inside the card DSL) — e.g. `"defs": { "go": "[Go · REST]" }` then `"card": "API|$go|REST"`. Cuts repeated tech tags / details.
+- Reuse: `scaffold_spec`/`get_example` → write to file → `validate_spec` → render by `spec_path`; edit deltas on iterations.
+
 ## Style standard (keep it consistent + legible)
 - One boundary per L3 view. If a diagram has many components, **split it** into several
   focused diagrams rather than one mega-diagram — cheaper to iterate and easier to read.

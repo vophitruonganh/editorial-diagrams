@@ -6,6 +6,7 @@ import { renderLane } from './engines/lane.mjs';
 import { renderGrid } from './engines/grid.mjs';
 import { renderSequence } from './engines/sequence.mjs';
 import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES, SEQUENCE_TYPES, PRESET_TYPES } from './types.mjs';
+import { expandDefs } from './defs.mjs';
 
 const ENGINES = {};
 for (const t of GRAPH_TYPES) ENGINES[t] = renderGraph;
@@ -16,7 +17,8 @@ for (const t of SEQUENCE_TYPES) ENGINES[t] = renderSequence;
 // Later phases register their engines here (lane, sequence).
 export function registerEngine(type, fn) { ENGINES[type] = fn; }
 
-export function renderByType(spec, css) {
+export function renderByType(rawSpec, css) {
+  let spec = expandDefs(rawSpec);
   const fn = spec && spec.type && ENGINES[spec.type];
   if (fn) return fn(spec, css);
   // flow engine: let `type` alone drive a preset (c4-l1..l3, dynamic) when `preset` is unset

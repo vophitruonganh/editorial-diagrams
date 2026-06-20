@@ -1,4 +1,5 @@
 import { GRAPH_TYPES, LANE_TYPES, GRID_TYPES, SEQUENCE_TYPES } from './types.mjs';
+import { expandDefs } from './defs.mjs';
 
 function validateSequence(spec) {
   const errors = [];
@@ -72,7 +73,8 @@ function validateGraph(spec) {
   return errors;
 }
 
-export function validateSpec(spec) {
+export function validateSpec(rawSpec) {
+  const spec = expandDefs(rawSpec);
   const errors = [];
   if (spec == null || typeof spec !== 'object' || Array.isArray(spec)) {
     return { valid: false, errors: ['spec must be a JSON object'] };
