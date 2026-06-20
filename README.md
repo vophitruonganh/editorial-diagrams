@@ -3,13 +3,33 @@
 MCP server that renders editorial-style architecture diagrams (PNG/PDF/SVG) from
 a compact JSON spec. Reuses the spec-driven generator + `editorial.css`.
 
-## Install (local path)
-1. `npm install` in this directory.
-2. Add as a Claude Code plugin from this local path, or register the MCP server
-   manually:
-   ```json
-   { "mcpServers": { "editorial-diagrams": { "command": "node", "args": ["/abs/path/src/server.mjs"] } } }
-   ```
+## Install as a Claude Code plugin
+
+The plugin self-bootstraps: on first run it installs its own dependencies
+(no need to commit `node_modules`; native `sharp`/`puppeteer-core` binaries are
+fetched for your OS). Requires `node` + `npm` on PATH.
+
+**From this repo (local path):**
+```
+/plugin marketplace add /Users/arvo/SilverTiger/editorial-diagrams-mcp
+/plugin install editorial-diagrams
+```
+
+**From git (after you push it to a remote):**
+```
+/plugin marketplace add <github-user>/<repo>
+/plugin install editorial-diagrams
+```
+
+First launch shows "installing dependencies (one time)…" on stderr, then the
+`editorial-diagrams` MCP server + the `editorial-diagrams` skill become available.
+
+**Manual MCP registration (no plugin system):** add to your MCP config:
+```json
+{ "mcpServers": { "editorial-diagrams": { "command": "node", "args": ["/abs/path/src/launch.mjs"] } } }
+```
+
+**Optional (future):** publish to npm and switch `.mcp.json` to `npx -y editorial-diagrams-mcp` for zero-clone installs.
 
 ## Diagram types
 - **Flow / C4** (built-in engine): c4-l1..l3, dynamic, deployment, landscape, layered, dfd, pipeline.
