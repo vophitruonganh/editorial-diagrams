@@ -20,14 +20,32 @@ function roundedPolygon(pts, r = 14) {
   return d + ' Z';
 }
 
+// A diamond only USES its inscribed (centred) rectangle for text — a box of half the
+// bbox in each axis exactly touches the four edges (w/2W + h/2H = 1). So to fit a text
+// block we size the bbox to ~2× the block, and we constrain the text to that 50%×50%
+// centred area so it can never spill outside the rhombus. Sizing is deliberately
+// generous (wide char width, tall line height) so the estimate always over-covers.
+function decisionSize(n) {
+  const chars = String(n.label ?? n.card ?? '').trim().length || 1;
+  const charW = 8.6, lineH = 20;
+  const targetLines = Math.max(1, Math.round(Math.sqrt(chars / 3.2)));   // keep the text block squarish
+  const perLine = Math.max(8, Math.ceil(chars / targetLines));
+  const tw = Math.min(240, Math.max(92, perLine * charW));
+  const lines = Math.max(1, Math.ceil(chars * charW / tw));
+  const th = lines * lineH;
+  return { w: Math.round(Math.max(150, tw * 2 + 30)), h: Math.round(Math.max(96, th * 2 + 30)) };
+}
+
 registerNode('decision', (n, geom) => {
   const { w, h } = geom, pad = 4;
   const pts = [{ x: w / 2, y: pad }, { x: w - pad, y: h / 2 }, { x: w / 2, y: h - pad }, { x: pad, y: h / 2 }];
   const label = esc(n.label ?? n.card ?? '');
+  // text lives in the centred inscribed rectangle (50%×50%); overflow:hidden is a hard
+  // backstop so text can never render outside the diamond even if the estimate is off.
   return `<div style="${posStyle(geom)}">` +
     `<svg width="${w}" height="${h}" style="position:absolute;left:0;top:0"><path d="${roundedPolygon(pts, 14)}" fill="#fff" stroke="#DCE0E6" stroke-width="1.5" stroke-linejoin="round"/></svg>` +
-    `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0f172a;font-size:14.5px;text-align:center;padding:0 8px">${label}</div></div>`;
-}, () => ({ w: 150, h: 96 }));
+    `<div style="position:absolute;left:25%;top:25%;width:50%;height:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0f172a;font-size:14px;line-height:1.2;text-align:center;word-break:break-word;overflow:hidden">${label}</div></div>`;
+}, decisionSize);
 
 registerNode('start', (n, geom) =>
   `<div style="${posStyle(geom)}border-radius:50%;background:${SLATE}"></div>`, () => ({ w: 26, h: 26 }));
