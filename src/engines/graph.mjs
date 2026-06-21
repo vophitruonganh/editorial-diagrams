@@ -35,6 +35,21 @@ export function nodeSizeOf(n) {
 
 const unit = (a, b) => { const v = { x: a.x - b.x, y: a.y - b.y }; const m = Math.hypot(v.x, v.y) || 1; return { x: v.x / m, y: v.y / m }; };
 
+// midpoint of a polyline by ARC LENGTH — the label sits on the body of the arrow,
+// never at an endpoint (pts[floor(n/2)] lands on the target for a 2-point edge).
+function midOfPath(pts) {
+  if (!pts || pts.length < 2) return pts && pts[0] || { x: 0, y: 0 };
+  let total = 0;
+  for (let i = 1; i < pts.length; i++) total += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+  let acc = 0, half = total / 2;
+  for (let i = 1; i < pts.length; i++) {
+    const dx = pts[i].x - pts[i - 1].x, dy = pts[i].y - pts[i - 1].y, len = Math.hypot(dx, dy) || 1;
+    if (acc + len >= half) { const t = (half - acc) / len; return { x: pts[i - 1].x + dx * t, y: pts[i - 1].y + dy * t }; }
+    acc += len;
+  }
+  return pts[Math.floor(pts.length / 2)];
+}
+
 export async function renderGraph(spec, css, opts = {}) {
   const nodes = spec.nodes || [];
   const edges = spec.edges || [];
@@ -55,7 +70,7 @@ export async function renderGraph(spec, css, opts = {}) {
     paths += `<path d="${edgePath(pts, { style: e.style || 'orthogonal' })}" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"${noArrow ? '' : ' marker-end="url(#arrow)"'}/>`;
     if (e.endFrom) glyphs += edgeEndGlyph(e.endFrom, pts[0], unit(pts[0], pts[1]), stroke);
     if (e.endTo) glyphs += edgeEndGlyph(e.endTo, pts[pts.length - 1], unit(pts[pts.length - 1], pts[pts.length - 2]), stroke);
-    if (e.label) labels += edgeLabelChip(e.labelPos || pts[Math.floor(pts.length / 2)], e.label);
+    if (e.label) labels += edgeLabelChip(midOfPath(pts), e.label);
   }
   const dim = `width="${laid.width}" height="${laid.height}" style="position:absolute;left:0;top:0;pointer-events:none"`;
   const edgeSvg = `<svg ${dim}>${arrowMarkerDefs()}${paths}${glyphs}</svg>`;

@@ -91,10 +91,21 @@ function diamond(P, D, c, fill) {
 registerEdgeEnd('diamond', (P, D, c) => diamond(P, D, c, '#fff'));
 registerEdgeEnd('diamond-filled', (P, D, c) => diamond(P, D, c, c));
 
+// Edge-label chip — wraps onto multiple lines (kept narrow) so long labels stay
+// compact and don't overrun neighbours; centred on the point it's given (callers
+// pass the path's arc-length midpoint, i.e. the BODY of the arrow, not its head).
 export function edgeLabelChip(point, text) {
   const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const w = String(text).length * 6.5 + 14;
-  return `<g transform="translate(${f(point.x - w / 2)},${f(point.y - 10)})">` +
-    `<rect width="${f(w)}" height="20" rx="5" fill="#fffbeb" stroke="#fde68a"/>` +
-    `<text x="${f(w / 2)}" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="${AMBER}" font-family="-apple-system,Segoe UI,Roboto,sans-serif">${esc(text)}</text></g>`;
+  const s = String(text ?? '');
+  // charW ≥ the real rendered width of bold 11.5px (incl. Vietnamese diacritics) so the
+  // chip is always wide enough for its line count — no mid-word wrap that gets clipped.
+  const MAXW = 130, padX = 9, padY = 3, lineH = 15, charW = 7.8;
+  const cpl = Math.max(5, Math.floor((MAXW - padX * 2) / charW));
+  const lines = Math.max(1, Math.ceil(s.length / cpl));
+  const w = lines > 1 ? MAXW : Math.min(MAXW, Math.ceil(s.length * charW) + padX * 2);
+  const h = lines * lineH + padY * 2;
+  return `<foreignObject x="${f(point.x - w / 2)}" y="${f(point.y - h / 2)}" width="${f(w)}" height="${f(h)}">` +
+    `<div xmlns="http://www.w3.org/1999/xhtml" style="box-sizing:border-box;width:${f(w)}px;display:flex;align-items:center;justify-content:center;` +
+    `text-align:center;font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:11.5px;font-weight:600;color:${AMBER};` +
+    `background:#fffbeb;border:1px solid #fde68a;border-radius:5px;padding:${padY}px ${padX}px;line-height:1.2">${esc(s)}</div></foreignObject>`;
 }

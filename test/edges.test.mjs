@@ -33,5 +33,5 @@ test('arrowMarkerDefs defines an arrow marker', () => {
 test('edgeLabelChip renders the label text', () => {
   const g = edgeLabelChip({ x: 100, y: 60 }, 'yes');
   assert.match(g, />yes</);
-  assert.match(g, /<rect/);
+  assert.match(g, /<foreignObject/);   // wraps in a foreignObject so long labels can break onto lines
 });
